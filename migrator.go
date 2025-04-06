@@ -15,6 +15,7 @@ const (
 	deleteAPI string = "_delete_by_query"
 )
 
+// Error messages to indicate various failure scenarios.
 var (
 	ErrCantEstablishConnection = fmt.Errorf("error: connection to elasticsearch can't be established")
 	ErrMappingsDontMatch       = fmt.Errorf("error: index exists, but mappings don't match")
@@ -25,32 +26,38 @@ var (
 	ErrUnexpected              = fmt.Errorf("error: unexpected")
 )
 
+// Migrator struct encapsulates the migration logic.
 type Migrator struct {
 	MigratorConfig
 }
 
+// MigratorConfig holds configurations for the migrator.
 type MigratorConfig struct {
 	Client        http.Client
 	Log           *slog.Logger
 	ElasticSearch ElasticSearch
 }
 
+// ElasticSearch struct holds the address, index details, and credentials for Elasticsearch.
 type ElasticSearch struct {
 	Address     string
 	Index       Index
 	Credentials Credentials
 }
 
+// Index holds the index name and its definition (mappings).
 type Index struct {
 	Name       string
 	Definition map[string]interface{}
 }
 
+// Credentials struct stores Elasticsearch credentials (username & password).
 type Credentials struct {
 	Username string
 	Password string
 }
 
+// New initializes a new Migrator instance with the provided configuration.
 func New(cfg MigratorConfig) *Migrator {
 	cfg.Log.Info(
 		"creating migrator",
@@ -62,6 +69,7 @@ func New(cfg MigratorConfig) *Migrator {
 	}
 }
 
+// MigrateUp() performs an "up" migration, either creating an index or adding documents.
 func (m *Migrator) MigrateUp(path string) error {
 	m.Log.Info(
 		"migrating up",
@@ -125,6 +133,7 @@ func (m *Migrator) MigrateUp(path string) error {
 	}
 }
 
+// MigrateDown() performs a "down" migration, either deleting documents or the entire index.
 func (m *Migrator) MigrateDown(documentsOnly bool) error {
 	m.Log.Info(
 		"migrating down",
@@ -184,6 +193,7 @@ func (m *Migrator) MigrateDown(documentsOnly bool) error {
 	}
 }
 
+// createDocuments() handles the creation of documents in the Elasticsearch index.
 func createDocuments(m *Migrator, path string) error {
 	documents, err := os.ReadFile(path)
 	if err != nil {
@@ -217,6 +227,7 @@ func createDocuments(m *Migrator, path string) error {
 	return nil
 }
 
+// deleteDocuments() handles the deletion of documents in the Elasticsearch index.
 func deleteDocuments(m *Migrator) error {
 	req, err := buildRequest(
 		http.MethodPost,
@@ -249,6 +260,7 @@ func deleteDocuments(m *Migrator) error {
 	return nil
 }
 
+// checkIndex() checks if the specified index exists in Elasticsearch and if the mappings match.
 func checkIndex(m *Migrator) error {
 	req, err := buildRequest(
 		http.MethodGet,
@@ -284,6 +296,7 @@ func checkIndex(m *Migrator) error {
 	return nil
 }
 
+// createIndex() creates a new index in Elasticsearch.
 func createIndex(m *Migrator) error {
 	req, err := buildRequest(
 		http.MethodPut,
@@ -313,6 +326,7 @@ func createIndex(m *Migrator) error {
 	return nil
 }
 
+// deleteIndex() deletes the specified index from Elasticsearch.
 func deleteIndex(m *Migrator) error {
 	req, err := buildRequest(
 		http.MethodDelete,
