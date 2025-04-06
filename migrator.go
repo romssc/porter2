@@ -59,6 +59,15 @@ type Credentials struct {
 
 // New initializes a new Migrator instance with the provided configuration.
 func New(cfg MigratorConfig) *Migrator {
+	if cfg.Log == nil {
+		cfg.Log = slog.New(slog.NewTextHandler(
+			os.Stdout,
+			&slog.HandlerOptions{
+				Level: slog.LevelDebug,
+			},
+		))
+	}
+
 	cfg.Log.Info(
 		"creating migrator",
 		slog.Any("config", cfg),
