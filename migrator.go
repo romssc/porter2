@@ -1,4 +1,4 @@
-package goelasticmigrator
+package elasticmigrator
 
 import (
 	"bytes"

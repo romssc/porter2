@@ -1,3 +1,3 @@
-module github.com/xoticdsign/go-elasticmigrator
+module github.com/xoticdsign/elasticmigrator
 
 go 1.22.5
