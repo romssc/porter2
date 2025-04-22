@@ -39,3 +39,5 @@ type GeoShapePropertiesFunc = utils.MapperFunc
 type IntegerRangePropertiesFunc = utils.MapperFunc
 type FloatRangePropertiesFunc = utils.MapperFunc
 type DateRangePropertiesFunc = utils.MapperFunc
+
+type DocumentsFunc = utils.MapperFunc
