@@ -14,8 +14,9 @@ import (
 )
 
 var (
-	ErrBadConnection = fmt.Errorf("bad connection to elasticsearch")
-	ErrCreatingIndex = fmt.Errorf("can't create an index")
+	errBadConnection     = fmt.Errorf("bad connection to elasticsearch")
+	errCreatingIndex     = fmt.Errorf("can't create an index")
+	errCreatingDocuments = fmt.Errorf("can't create documents")
 
 	ErrMigrateIndex     = fmt.Errorf("can't migrate an index...")
 	ErrMigrateDocuments = fmt.Errorf("can't migrate documents...")
@@ -93,13 +94,13 @@ func (c client) CreateIndex(ctx context.Context, name string, body []byte) error
 		c.Indices.Create.WithPretty(),
 	)
 	if err != nil {
-		return fmt.Errorf("%w: %s", ErrBadConnection, err)
+		return fmt.Errorf("%w: %s", errBadConnection, err)
 	}
 	defer resp.Body.Close()
 
 	r, ok := utils.ExtractError(resp.Body)
 	if ok {
-		return fmt.Errorf("%w: %s", ErrCreatingIndex, r)
+		return fmt.Errorf("%w: %s", errCreatingIndex, r)
 	}
 
 	return nil
@@ -113,7 +114,7 @@ func (c client) CreateDocuments(ctx context.Context, name string, documents []by
 		c.Bulk.WithPretty(),
 	)
 	if err != nil {
-		return fmt.Errorf("%w: %s", ErrBadConnection, err)
+		return fmt.Errorf("%w: %s", errBadConnection, err)
 	}
 	defer resp.Body.Close()
 
@@ -151,7 +152,7 @@ func (c client) CreateDocuments(ctx context.Context, name string, documents []by
 		}
 	}
 
-	return fmt.Errorf(strings.Join(errors, ", "))
+	return fmt.Errorf("%w: %s", errCreatingDocuments, strings.Join(errors, " + "))
 }
 
 func (c client) DeleteIndex(ctx context.Context, name string) error {
@@ -161,7 +162,7 @@ func (c client) DeleteIndex(ctx context.Context, name string) error {
 		c.Indices.Delete.WithPretty(),
 	)
 	if err != nil {
-		return fmt.Errorf("%w: %s", ErrBadConnection, err)
+		return fmt.Errorf("%w: %s", errBadConnection, err)
 	}
 	defer resp.Body.Close()
 
@@ -180,7 +181,7 @@ func (c client) DeleteDocuments(ctx context.Context, name string, query string) 
 		c.DeleteByQuery.WithPretty(),
 	)
 	if err != nil {
-		return fmt.Errorf("%w: %s", ErrBadConnection, err)
+		return fmt.Errorf("%w: %s", errBadConnection, err)
 	}
 	defer resp.Body.Close()
 
