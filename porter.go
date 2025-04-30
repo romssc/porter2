@@ -14,11 +14,11 @@ import (
 )
 
 var (
-	ErrBadConnection     = fmt.Errorf("bad connection to elasticsearch")
-	ErrCreatingIndex     = fmt.Errorf("can't create an index")
-	ErrCreatingDocuments = fmt.Errorf("can't create documents")
-	ErrDeletingIndex     = fmt.Errorf("can't delete an index")
-	ErrDeletingDocuments = fmt.Errorf("can't delete documents")
+	ErrClientBadConnection     = fmt.Errorf("bad connection to elasticsearch")
+	ErrClientCreatingIndex     = fmt.Errorf("can't create an index")
+	ErrClientCreatingDocuments = fmt.Errorf("can't create documents")
+	ErrClientDeletingIndex     = fmt.Errorf("can't delete an index")
+	ErrClientDeletingDocuments = fmt.Errorf("can't delete documents")
 
 	ErrMigrateIndex     = fmt.Errorf("can't migrate an index...")
 	ErrMigrateDocuments = fmt.Errorf("can't migrate documents...")
@@ -96,13 +96,13 @@ func (c client) CreateIndex(ctx context.Context, name string, body []byte) error
 		c.Indices.Create.WithPretty(),
 	)
 	if err != nil {
-		return fmt.Errorf("%w: %s", ErrBadConnection, err)
+		return fmt.Errorf("%w: %s", ErrClientBadConnection, err)
 	}
 	defer resp.Body.Close()
 
 	r, ok := utils.ExtractError(resp.Body)
 	if ok {
-		return fmt.Errorf("%w: %s", ErrCreatingIndex, r)
+		return fmt.Errorf("%w: %s", ErrClientCreatingIndex, r)
 	}
 
 	return nil
@@ -116,7 +116,7 @@ func (c client) CreateDocuments(ctx context.Context, name string, documents []by
 		c.Bulk.WithPretty(),
 	)
 	if err != nil {
-		return fmt.Errorf("%w: %s", ErrBadConnection, err)
+		return fmt.Errorf("%w: %s", ErrClientBadConnection, err)
 	}
 	defer resp.Body.Close()
 
@@ -154,7 +154,7 @@ func (c client) CreateDocuments(ctx context.Context, name string, documents []by
 		}
 	}
 
-	return fmt.Errorf("%w: %s", ErrCreatingDocuments, strings.Join(errors, " + "))
+	return fmt.Errorf("%w: %s", ErrClientCreatingDocuments, strings.Join(errors, " + "))
 }
 
 func (c client) DeleteIndex(ctx context.Context, name string) error {
@@ -164,13 +164,13 @@ func (c client) DeleteIndex(ctx context.Context, name string) error {
 		c.Indices.Delete.WithPretty(),
 	)
 	if err != nil {
-		return fmt.Errorf("%w: %s", ErrBadConnection, err)
+		return fmt.Errorf("%w: %s", ErrClientBadConnection, err)
 	}
 	defer resp.Body.Close()
 
 	r, ok := utils.ExtractError(resp.Body)
 	if ok {
-		return fmt.Errorf("%w: %s", ErrDeletingIndex, r)
+		return fmt.Errorf("%w: %s", ErrClientDeletingIndex, r)
 	}
 	return nil
 }
@@ -183,13 +183,13 @@ func (c client) DeleteDocuments(ctx context.Context, name string, query string) 
 		c.DeleteByQuery.WithPretty(),
 	)
 	if err != nil {
-		return fmt.Errorf("%w: %s", ErrBadConnection, err)
+		return fmt.Errorf("%w: %s", ErrClientBadConnection, err)
 	}
 	defer resp.Body.Close()
 
 	r, ok := utils.ExtractError(resp.Body)
 	if ok {
-		return fmt.Errorf("%w: %s", ErrDeletingDocuments, r)
+		return fmt.Errorf("%w: %s", ErrClientDeletingDocuments, r)
 	}
 	return nil
 }
