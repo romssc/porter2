@@ -22,8 +22,8 @@ var (
 	ErrMigratingIndex     = fmt.Errorf("failed to migrate an index")
 	ErrMigratingDocuments = fmt.Errorf("failed to migrate documents")
 
-	ErrMigrateIndex     = fmt.Errorf("can't migrate an index...")
-	ErrMigrateDocuments = fmt.Errorf("can't migrate documents...")
+	ErrMigratingUp   = fmt.Errorf("failed to migrate up")
+	ErrMigratingDown = fmt.Errorf("failed to migrate down")
 )
 
 // Constants for migration direction
@@ -270,12 +270,12 @@ func (m M) MigrateUp(config Config, index indexFunc, documents documentsFunc) er
 
 	err := index(t)
 	if err != nil {
-		return fmt.Errorf("%w\n\n%v", ErrMigrateIndex, err)
+		return fmt.Errorf("%w\n%v", ErrMigratingUp, err)
 	}
 
 	err = documents(t)
 	if err != nil {
-		return fmt.Errorf("%w\n\n%v", ErrMigrateDocuments, err)
+		return fmt.Errorf("%w\n%v", ErrMigratingUp, err)
 	}
 
 	return nil
@@ -292,12 +292,12 @@ func (m M) MigrateDown(config Config, documents documentsFunc, index indexFunc) 
 
 	err := documents(t)
 	if err != nil {
-		return err
+		return fmt.Errorf("%w\n%v", ErrMigratingDown, err)
 	}
 
 	err = index(t)
 	if err != nil {
-		return err
+		return fmt.Errorf("%w\n%v", ErrMigratingDown, err)
 	}
 
 	return nil
