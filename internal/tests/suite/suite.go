@@ -20,6 +20,11 @@ type suite struct {
 	T *testing.T
 
 	Porter porter.M
+	Temp   temp
+}
+
+type temp struct {
+	config porter.Config
 }
 
 type mockClient struct{}
@@ -88,7 +93,7 @@ func New(t *testing.T, offline bool) (*suite, error) {
 			return nil, err
 		}
 
-		porter := porter.New(cc)
+		p := porter.New(cc)
 
 		t.Cleanup(func() {
 			ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
@@ -103,15 +108,21 @@ func New(t *testing.T, offline bool) (*suite, error) {
 		return &suite{
 			T: t,
 
-			Porter: porter,
+			Porter: p,
+			Temp: temp{
+				config: porter.Config{Name: "porter"},
+			},
 		}, nil
 	}
-	porter := porter.New(nil)
-	porter.Client = mockClient{}
+	p := porter.New(nil)
+	p.Client = mockClient{}
 
 	return &suite{
 		T: t,
 
-		Porter: porter,
+		Porter: p,
+		Temp: temp{
+			config: porter.Config{Name: "porter"},
+		},
 	}, nil
 }
