@@ -14,11 +14,11 @@ import (
 )
 
 var (
-	ErrClientBadConnection     = fmt.Errorf("bad connection to elasticsearch")
-	ErrClientCreatingIndex     = fmt.Errorf("can't create an index")
-	ErrClientCreatingDocuments = fmt.Errorf("can't create documents")
-	ErrClientDeletingIndex     = fmt.Errorf("can't delete an index")
-	ErrClientDeletingDocuments = fmt.Errorf("can't delete documents")
+	ErrClientBadConnection     = fmt.Errorf("unable to establish connection to elasticsearch. check address, port, or network availability")
+	ErrClientCreatingIndex     = fmt.Errorf("failed to create index. elasticsearch client operation unsuccessful")
+	ErrClientCreatingDocuments = fmt.Errorf("failed to create documents. bulk indexing operation did not complete successfully")
+	ErrClientDeletingIndex     = fmt.Errorf("failed to delete index. elasticsearch client could not remove the specified index")
+	ErrClientDeletingDocuments = fmt.Errorf("failed to delete documents. delete-by-query operation did not complete successfullys")
 
 	ErrMigrateIndex     = fmt.Errorf("can't migrate an index...")
 	ErrMigrateDocuments = fmt.Errorf("can't migrate documents...")
@@ -314,8 +314,6 @@ func (i index) NoIndex() indexFunc {
 func (i index) MigrateIndex() indexFunc {
 	return func(t temp) error {
 		if t.direction == directionUp {
-			const op = "> MigrateIndex()"
-
 			err := t.client.CreateIndex(context.Background(), t.config.Name, utils.MarshalJSON(t.config.Definition))
 			if err != nil {
 				return fmt.Errorf("%s.CreateIndex() @ \n\n %v", op, err)
