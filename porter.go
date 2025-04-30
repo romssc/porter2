@@ -98,13 +98,13 @@ func (c client) CreateIndex(ctx context.Context, name string, body []byte) error
 		c.Indices.Create.WithPretty(),
 	)
 	if err != nil {
-		return fmt.Errorf("%w\n%s", ErrClientBadConnection, err)
+		return fmt.Errorf("%w [%s]", ErrClientBadConnection, err)
 	}
 	defer resp.Body.Close()
 
 	r, ok := utils.ExtractError(resp.Body)
 	if ok {
-		return fmt.Errorf("%w\n%s", ErrClientCreatingIndex, r)
+		return fmt.Errorf("%w [%s]", ErrClientCreatingIndex, r)
 	}
 
 	return nil
@@ -118,7 +118,7 @@ func (c client) CreateDocuments(ctx context.Context, name string, documents []by
 		c.Bulk.WithPretty(),
 	)
 	if err != nil {
-		return fmt.Errorf("%w\n%s", ErrClientBadConnection, err)
+		return fmt.Errorf("%w [%s]", ErrClientBadConnection, err)
 	}
 	defer resp.Body.Close()
 
@@ -156,7 +156,7 @@ func (c client) CreateDocuments(ctx context.Context, name string, documents []by
 		}
 	}
 
-	return fmt.Errorf("%w\n%s", ErrClientCreatingDocuments, strings.Join(errors, " + "))
+	return fmt.Errorf("%w [%s]", ErrClientCreatingDocuments, strings.Join(errors, " + "))
 }
 
 func (c client) DeleteIndex(ctx context.Context, name string) error {
@@ -166,13 +166,13 @@ func (c client) DeleteIndex(ctx context.Context, name string) error {
 		c.Indices.Delete.WithPretty(),
 	)
 	if err != nil {
-		return fmt.Errorf("%w\n%s", ErrClientBadConnection, err)
+		return fmt.Errorf("%w [%s]", ErrClientBadConnection, err)
 	}
 	defer resp.Body.Close()
 
 	r, ok := utils.ExtractError(resp.Body)
 	if ok {
-		return fmt.Errorf("%w\n%s", ErrClientDeletingIndex, r)
+		return fmt.Errorf("%w [%s]", ErrClientDeletingIndex, r)
 	}
 	return nil
 }
@@ -185,13 +185,13 @@ func (c client) DeleteDocuments(ctx context.Context, name string, query string) 
 		c.DeleteByQuery.WithPretty(),
 	)
 	if err != nil {
-		return fmt.Errorf("%w\n%s", ErrClientBadConnection, err)
+		return fmt.Errorf("%w [%s]", ErrClientBadConnection, err)
 	}
 	defer resp.Body.Close()
 
 	r, ok := utils.ExtractError(resp.Body)
 	if ok {
-		return fmt.Errorf("%w\n%s", ErrClientDeletingDocuments, r)
+		return fmt.Errorf("%w [%s]", ErrClientDeletingDocuments, r)
 	}
 	return nil
 }
