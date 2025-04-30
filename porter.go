@@ -341,7 +341,7 @@ func (d documents) NoDocuments() documentsFunc {
 }
 
 // MigrateDocuments migrates the documents up or down, depending on the migration direction.
-func (d documents) MigrateDocuments(origin originFunc) documentsFunc {
+func (d documents) MigrateDocuments(origin OriginFunc) documentsFunc {
 	return func(t temp) error {
 		if t.direction == directionUp {
 			docs, err := origin(t)
