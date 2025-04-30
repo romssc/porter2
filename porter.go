@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"strings"
 
@@ -14,13 +13,14 @@ import (
 )
 
 var (
-	ErrClientBadConnection     = fmt.Errorf("unable to establish connection to elasticsearch. check address, port, or network availability")
-	ErrClientCreatingIndex     = fmt.Errorf("failed to create index. elasticsearch client operation unsuccessful")
-	ErrClientCreatingDocuments = fmt.Errorf("failed to create documents. bulk indexing operation did not complete successfully")
-	ErrClientDeletingIndex     = fmt.Errorf("failed to delete index. elasticsearch client could not remove the specified index")
-	ErrClientDeletingDocuments = fmt.Errorf("failed to delete documents. delete-by-query operation did not complete successfullys")
+	ErrClientBadConnection     = fmt.Errorf("unable to establish connection to elasticsearch")
+	ErrClientCreatingIndex     = fmt.Errorf("failed to create index")
+	ErrClientCreatingDocuments = fmt.Errorf("failed to create documents")
+	ErrClientDeletingIndex     = fmt.Errorf("failed to delete index")
+	ErrClientDeletingDocuments = fmt.Errorf("failed to delete documents")
 
-	ErrMigratingIndex = fmt.Errorf("failed to migrate an index")
+	ErrMigratingIndex     = fmt.Errorf("failed to migrate an index")
+	ErrMigratingDocuments = fmt.Errorf("failed to migrate documents")
 
 	ErrMigrateIndex     = fmt.Errorf("can't migrate an index...")
 	ErrMigrateDocuments = fmt.Errorf("can't migrate documents...")
@@ -98,13 +98,13 @@ func (c client) CreateIndex(ctx context.Context, name string, body []byte) error
 		c.Indices.Create.WithPretty(),
 	)
 	if err != nil {
-		return fmt.Errorf("%w: %s", ErrClientBadConnection, err)
+		return fmt.Errorf("%w\n%s", ErrClientBadConnection, err)
 	}
 	defer resp.Body.Close()
 
 	r, ok := utils.ExtractError(resp.Body)
 	if ok {
-		return fmt.Errorf("%w: %s", ErrClientCreatingIndex, r)
+		return fmt.Errorf("%w\n%s", ErrClientCreatingIndex, r)
 	}
 
 	return nil
@@ -118,7 +118,7 @@ func (c client) CreateDocuments(ctx context.Context, name string, documents []by
 		c.Bulk.WithPretty(),
 	)
 	if err != nil {
-		return fmt.Errorf("%w: %s", ErrClientBadConnection, err)
+		return fmt.Errorf("%w\n%s", ErrClientBadConnection, err)
 	}
 	defer resp.Body.Close()
 
@@ -156,7 +156,7 @@ func (c client) CreateDocuments(ctx context.Context, name string, documents []by
 		}
 	}
 
-	return fmt.Errorf("%w: %s", ErrClientCreatingDocuments, strings.Join(errors, " + "))
+	return fmt.Errorf("%w\n%s", ErrClientCreatingDocuments, strings.Join(errors, " + "))
 }
 
 func (c client) DeleteIndex(ctx context.Context, name string) error {
@@ -166,13 +166,13 @@ func (c client) DeleteIndex(ctx context.Context, name string) error {
 		c.Indices.Delete.WithPretty(),
 	)
 	if err != nil {
-		return fmt.Errorf("%w: %s", ErrClientBadConnection, err)
+		return fmt.Errorf("%w\n%s", ErrClientBadConnection, err)
 	}
 	defer resp.Body.Close()
 
 	r, ok := utils.ExtractError(resp.Body)
 	if ok {
-		return fmt.Errorf("%w: %s", ErrClientDeletingIndex, r)
+		return fmt.Errorf("%w\n%s", ErrClientDeletingIndex, r)
 	}
 	return nil
 }
@@ -185,13 +185,13 @@ func (c client) DeleteDocuments(ctx context.Context, name string, query string) 
 		c.DeleteByQuery.WithPretty(),
 	)
 	if err != nil {
-		return fmt.Errorf("%w: %s", ErrClientBadConnection, err)
+		return fmt.Errorf("%w\n%s", ErrClientBadConnection, err)
 	}
 	defer resp.Body.Close()
 
 	r, ok := utils.ExtractError(resp.Body)
 	if ok {
-		return fmt.Errorf("%w: %s", ErrClientDeletingDocuments, r)
+		return fmt.Errorf("%w\n%s", ErrClientDeletingDocuments, r)
 	}
 	return nil
 }
@@ -318,13 +318,13 @@ func (i index) MigrateIndex() indexFunc {
 		if t.direction == directionUp {
 			err := t.client.CreateIndex(context.Background(), t.config.Name, utils.MarshalJSON(t.config.Definition))
 			if err != nil {
-				return fmt.Errorf("%w: %s", ErrMigratingIndex, err)
+				return fmt.Errorf("%w\n%s", ErrMigratingIndex, err)
 			}
 			return nil
 		} else {
 			err := t.client.DeleteIndex(context.Background(), t.config.Name)
 			if err != nil {
-				return fmt.Errorf("%w: %s", ErrMigratingIndex, err)
+				return fmt.Errorf("%w\n%s", ErrMigratingIndex, err)
 			}
 			return nil
 		}
@@ -344,30 +344,20 @@ func (d documents) NoDocuments() documentsFunc {
 func (d documents) MigrateDocuments(origin originFunc) documentsFunc {
 	return func(t temp) error {
 		if t.direction == directionUp {
-			const op = "> MigrateDocuments()"
-
 			docs, err := origin(t)
 			if err != nil {
-				switch {
-				case errors.Is(err, errLocationFromFile):
-					return fmt.Errorf("%s.FromFile() @ \n\n %v", op, err)
-
-				default:
-					return fmt.Errorf("%s @ %v", op, err)
-				}
+				return fmt.Errorf("%w\n%v", ErrMigratingDocuments, err)
 			}
 
 			err = t.client.CreateDocuments(context.Background(), t.config.Name, docs)
 			if err != nil {
-				return fmt.Errorf("%s.CreateDocuments() @ \n\n %v", op, err)
+				return fmt.Errorf("%w\n%v", ErrMigratingDocuments, err)
 			}
 			return nil
 		} else {
-			const op = "< MigrateDocuments()"
-
 			err := t.client.DeleteDocuments(context.Background(), t.config.Name, `{"query": {"match_all": {}}}`)
 			if err != nil {
-				return fmt.Errorf("%s.DeleteDocuments() @ \n\n %v", op, err)
+				return fmt.Errorf("%w\n%v", ErrMigratingDocuments, err)
 			}
 			return nil
 		}
