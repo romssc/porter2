@@ -91,7 +91,7 @@ func TestMigrateUp_Integration(t *testing.T) {
 			},
 			inWithIndex:     false,
 			inWithDocuments: true,
-			expectedErr:     porter.ErrMigrateDocuments,
+			expectedErr:     porter.ErrPorterMigratingUp,
 		},
 	}
 
