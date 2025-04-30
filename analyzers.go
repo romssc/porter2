@@ -16,24 +16,15 @@ functions, which are ultimately compiled to Elasticsearch-compatible JSON object
 */
 
 type analyzer struct {
-	// Standard analyzer.
-	Standart analyzerStandard
-	// Simple analyzer.
-	Simple analyzerSimple
-	// Whitespace analyzer.
-	Whitespace analyzerWhitespace
-	// Stop analyzer.
-	Stop analyzerStop
-	// Keyword analyzer.
-	Keyword analyzerKeyword
-	// Pattern analyzer.
-	Pattern analyzerPattern
-	// Language-specific analyzer.
-	Language analyzerLanguage
-	// Fingerprint analyzer.
+	Standart    analyzerStandard
+	Simple      analyzerSimple
+	Whitespace  analyzerWhitespace
+	Stop        analyzerStop
+	Keyword     analyzerKeyword
+	Pattern     analyzerPattern
+	Language    analyzerLanguage
 	Fingerprint analyzerFingerprint
-	// Custom analyzer.
-	Custom analyzerCustom
+	Custom      analyzerCustom
 }
 
 // NewAnalyzer() applies an analyzerFunc to return a map structure used in Elasticsearch settings.
