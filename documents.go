@@ -29,9 +29,7 @@ var (
 )
 
 type location struct {
-	// FromFile location.
 	FromFile locationFromFile
-	// Generate location.
 	Generate locationGenerate
 }
 
