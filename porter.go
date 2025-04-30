@@ -14,6 +14,7 @@ import (
 )
 
 var (
+	ErrBadConnection    = fmt.Errorf("bad connection to elasticsearch")
 	ErrMigrateIndex     = fmt.Errorf("can't migrate an index...")
 	ErrMigrateDocuments = fmt.Errorf("can't migrate documents...")
 )
@@ -90,7 +91,7 @@ func (c client) CreateIndex(ctx context.Context, name string, body []byte) error
 		c.Indices.Create.WithPretty(),
 	)
 	if err != nil {
-		return err
+		return fmt.Errorf("%w: %s", ErrBadConnection, err)
 	}
 	defer resp.Body.Close()
 
@@ -110,7 +111,7 @@ func (c client) CreateDocuments(ctx context.Context, name string, documents []by
 		c.Bulk.WithPretty(),
 	)
 	if err != nil {
-		return err
+		return fmt.Errorf("%w: %s", ErrBadConnection, err)
 	}
 	defer resp.Body.Close()
 
@@ -158,7 +159,7 @@ func (c client) DeleteIndex(ctx context.Context, name string) error {
 		c.Indices.Delete.WithPretty(),
 	)
 	if err != nil {
-		return err
+		return fmt.Errorf("%w: %s", ErrBadConnection, err)
 	}
 	defer resp.Body.Close()
 
@@ -177,7 +178,7 @@ func (c client) DeleteDocuments(ctx context.Context, name string, query string) 
 		c.DeleteByQuery.WithPretty(),
 	)
 	if err != nil {
-		return err
+		return fmt.Errorf("%w: %s", ErrBadConnection, err)
 	}
 	defer resp.Body.Close()
 
