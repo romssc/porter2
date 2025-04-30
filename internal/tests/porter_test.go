@@ -234,10 +234,10 @@ func TestMigrateDown_Integration(t *testing.T) {
 
 			switch {
 			case cs.expectedErr:
-				assert.Error(t, err, err)
+				assert.Error(t, err)
 
 			case !cs.expectedErr:
-				assert.NoError(t, err, err)
+				assert.NoError(t, err)
 			}
 		})
 	}
