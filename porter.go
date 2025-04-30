@@ -13,17 +13,17 @@ import (
 )
 
 var (
-	ErrClientBadConnection     = fmt.Errorf("unable to establish connection to elasticsearch")
-	ErrClientCreatingIndex     = fmt.Errorf("failed to create index")
-	ErrClientCreatingDocuments = fmt.Errorf("failed to create documents")
-	ErrClientDeletingIndex     = fmt.Errorf("failed to delete index")
-	ErrClientDeletingDocuments = fmt.Errorf("failed to delete documents")
+	ErrClientBadConnection     = fmt.Errorf("elasticsearch client: failed to establish a connection")
+	ErrClientCreatingIndex     = fmt.Errorf("elasticsearch client: failed to create index")
+	ErrClientCreatingDocuments = fmt.Errorf("elasticsearch client: bulk insert operation failed")
+	ErrClientDeletingIndex     = fmt.Errorf("elasticsearch client: failed to delete index")
+	ErrClientDeletingDocuments = fmt.Errorf("elasticsearch client: failed to delete documents by query")
 
-	ErrMigratingIndex     = fmt.Errorf("failed to migrate an index")
-	ErrMigratingDocuments = fmt.Errorf("failed to migrate documents")
+	ErrMigratorMigratingIndex = fmt.Errorf("migrator: index operation failed during migration process")
+	ErrMigratorDocuments      = fmt.Errorf("migrator: document operation failed during migration process")
 
-	ErrMigratingUp   = fmt.Errorf("failed to migrate up")
-	ErrMigratingDown = fmt.Errorf("failed to migrate down")
+	ErrPorterMigratingUp   = fmt.Errorf("porter: failed to perform 'up' migration")
+	ErrPorterMigratingDown = fmt.Errorf("porter: failed to perform 'down' migration")
 )
 
 // Constants for migration direction
@@ -270,12 +270,12 @@ func (m M) MigrateUp(config Config, index indexFunc, documents documentsFunc) er
 
 	err := index(t)
 	if err != nil {
-		return fmt.Errorf("%w\n%v", ErrMigratingUp, err)
+		return fmt.Errorf("%w\n%v", ErrPorterMigratingUp, err)
 	}
 
 	err = documents(t)
 	if err != nil {
-		return fmt.Errorf("%w\n%v", ErrMigratingUp, err)
+		return fmt.Errorf("%w\n%v", ErrPorterMigratingUp, err)
 	}
 
 	return nil
@@ -292,12 +292,12 @@ func (m M) MigrateDown(config Config, documents documentsFunc, index indexFunc) 
 
 	err := documents(t)
 	if err != nil {
-		return fmt.Errorf("%w\n%v", ErrMigratingDown, err)
+		return fmt.Errorf("%w\n%v", ErrPorterMigratingDown, err)
 	}
 
 	err = index(t)
 	if err != nil {
-		return fmt.Errorf("%w\n%v", ErrMigratingDown, err)
+		return fmt.Errorf("%w\n%v", ErrPorterMigratingDown, err)
 	}
 
 	return nil
@@ -318,13 +318,13 @@ func (i index) MigrateIndex() indexFunc {
 		if t.direction == directionUp {
 			err := t.client.CreateIndex(context.Background(), t.config.Name, utils.MarshalJSON(t.config.Definition))
 			if err != nil {
-				return fmt.Errorf("%w\n%s", ErrMigratingIndex, err)
+				return fmt.Errorf("%w\n%s", ErrMigratorMigratingIndex, err)
 			}
 			return nil
 		} else {
 			err := t.client.DeleteIndex(context.Background(), t.config.Name)
 			if err != nil {
-				return fmt.Errorf("%w\n%s", ErrMigratingIndex, err)
+				return fmt.Errorf("%w\n%s", ErrMigratorMigratingIndex, err)
 			}
 			return nil
 		}
@@ -346,18 +346,18 @@ func (d documents) MigrateDocuments(origin originFunc) documentsFunc {
 		if t.direction == directionUp {
 			docs, err := origin(t)
 			if err != nil {
-				return fmt.Errorf("%w\n%v", ErrMigratingDocuments, err)
+				return fmt.Errorf("%w\n%v", ErrMigratorDocuments, err)
 			}
 
 			err = t.client.CreateDocuments(context.Background(), t.config.Name, docs)
 			if err != nil {
-				return fmt.Errorf("%w\n%v", ErrMigratingDocuments, err)
+				return fmt.Errorf("%w\n%v", ErrMigratorDocuments, err)
 			}
 			return nil
 		} else {
 			err := t.client.DeleteDocuments(context.Background(), t.config.Name, `{"query": {"match_all": {}}}`)
 			if err != nil {
-				return fmt.Errorf("%w\n%v", ErrMigratingDocuments, err)
+				return fmt.Errorf("%w\n%v", ErrMigratorDocuments, err)
 			}
 			return nil
 		}
