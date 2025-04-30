@@ -33,4 +33,4 @@ jobs:
         run: go mod tidy
       - name: Run
         run: |
-          go test -v --run _Integration ./tests
+          go test -v --run _Integration ./internal/tests
