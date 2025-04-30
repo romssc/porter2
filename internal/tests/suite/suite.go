@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/tls"
 	"fmt"
+	"net"
 	"net/http"
 	"testing"
 	"time"
@@ -17,64 +18,47 @@ import (
 )
 
 type suite struct {
-	*testing.T
+	T *testing.T
 
-	Elasticsearch *es
-	Migrator      migrator
+	Porter porter.M
 }
 
-type es struct {
-	client
+type mockClient struct{}
 
-	Container testcontainers.Container
-}
-
-type client struct {
-	*elasticsearch.Client
-}
-
-func (c client) IsIndexExist(ctx context.Context, name string) (*esapi.Response, error) {
+func (m mockClient) CreateIndex(ctx context.Context, name string, body []byte) (*esapi.Response, error) {
 	return nil, nil
 }
 
-func (c client) CreateIndex(ctx context.Context, name string, body []byte) (*esapi.Response, error) {
+func (m mockClient) CreateDocuments(ctx context.Context, name string, documents []byte) (*esapi.Response, error) {
 	return nil, nil
 }
 
-func (c client) CreateDocuments(ctx context.Context, name string, documents []byte) (*esapi.Response, error) {
+func (m mockClient) DeleteIndex(ctx context.Context, name string) (*esapi.Response, error) {
 	return nil, nil
 }
 
-func (c client) DeleteIndex(ctx context.Context, name string) (*esapi.Response, error) {
+func (m mockClient) DeleteDocuments(ctx context.Context, name string, query string) (*esapi.Response, error) {
 	return nil, nil
 }
 
-func (c client) DeleteDocuments(ctx context.Context, name string, query string) (*esapi.Response, error) {
-	return nil, nil
+type config struct {
+	Elasticsearch elasticsearchConfig `yaml:"elasticsearch"`
+
+	StartupTimeout     time.Duration `yaml:"startup_timeout"`
+	TerminationTimeout time.Duration `yaml:"termination_timeout"`
 }
 
-type migrator struct {
-	Components porter.C
+type elasticsearchConfig struct {
+	Image   string `yaml:"image"`
+	Port    string `yaml:"ports"`
+	Network string `yaml:"network"`
 }
 
-func New(t *testing.T, d bool) *suite {
+func New(t *testing.T, offline bool) (*suite, error) {
 	t.Helper()
 	t.Parallel()
 
-	components := porter.GetComponents()
-
-	if !d {
-		return &suite{
-			T: t,
-
-			Elasticsearch: &es{
-				client: client{},
-			},
-			Migrator: migrator{
-				Components: components,
-			},
-		}
-	} else {
+	if !offline {
 		container, err := testcontainers.GenericContainer(context.Background(), testcontainers.GenericContainerRequest{
 			ContainerRequest: testcontainers.ContainerRequest{
 				Image:        "docker.io/elasticsearch:8.16.6",
@@ -95,39 +79,53 @@ func New(t *testing.T, d bool) *suite {
 			Started: true,
 		})
 		if err != nil {
-			panic(err)
+			return nil, err
 		}
 
 		host, err := container.Host(context.Background())
 		if err != nil {
-			panic(err)
+			return nil, err
 		}
 
 		port, err := container.MappedPort(context.Background(), "9200")
 		if err != nil {
-			panic(err)
+			return nil, err
 		}
 
 		cc, err := elasticsearch.NewClient(elasticsearch.Config{
-			Addresses: []string{fmt.Sprintf("http://%s:%s", host, port.Port())},
+			Addresses: []string{fmt.Sprintf("http://%s", net.JoinHostPort(host, port.Port()))},
 			Transport: &http.Transport{
 				TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 			},
 		})
 		if err != nil {
-			panic(err)
+			return nil, err
 		}
+
+		porter := porter.New(cc)
+
+		t.Cleanup(func() {
+			ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
+			defer cancel()
+
+			err := container.Terminate(ctx)
+			if err != nil {
+				panic(err)
+			}
+		})
 
 		return &suite{
 			T: t,
 
-			Elasticsearch: &es{
-				client:    client{cc},
-				Container: container,
-			},
-			Migrator: migrator{
-				Components: components,
-			},
-		}
+			Porter: porter,
+		}, nil
 	}
+	porter := porter.New(nil)
+	porter.Client = mockClient{}
+
+	return &suite{
+		T: t,
+
+		Porter: porter,
+	}, nil
 }

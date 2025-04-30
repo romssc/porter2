@@ -5,6 +5,7 @@ go 1.23.0
 toolchain go1.23.8
 
 require (
+	github.com/brianvoe/gofakeit/v7 v7.2.1
 	github.com/elastic/go-elasticsearch/v8 v8.18.0
 	github.com/stretchr/testify v1.10.0
 	github.com/testcontainers/testcontainers-go v0.36.0
