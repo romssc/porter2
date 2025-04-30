@@ -14,7 +14,9 @@ import (
 )
 
 var (
-	ErrBadConnection    = fmt.Errorf("bad connection to elasticsearch")
+	ErrBadConnection = fmt.Errorf("bad connection to elasticsearch")
+	ErrCreatingIndex = fmt.Errorf("can't create an index")
+
 	ErrMigrateIndex     = fmt.Errorf("can't migrate an index...")
 	ErrMigrateDocuments = fmt.Errorf("can't migrate documents...")
 )
@@ -97,7 +99,7 @@ func (c client) CreateIndex(ctx context.Context, name string, body []byte) error
 
 	r, ok := utils.ExtractError(resp.Body)
 	if ok {
-		return fmt.Errorf(r)
+		return fmt.Errorf("%w: %s", ErrCreatingIndex, r)
 	}
 
 	return nil
