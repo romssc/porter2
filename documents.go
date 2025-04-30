@@ -59,7 +59,7 @@ func newLocationGenerate() LocationGenerate {
 			for c := 1; c <= amount; c++ {
 				m := map[string]interface{}{
 					"index": map[string]interface{}{
-						"_index": t.config.Name,
+						"_index": t.Config.Name,
 						"_id":    c,
 					},
 				}

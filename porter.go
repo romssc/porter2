@@ -253,19 +253,19 @@ func New(cc *elasticsearch.Client) M {
 
 // Temp{} represents temporary data during the migration process, including the direction (up or down).
 type Temp struct {
-	direction int
+	Config Config
+	Client searcher
 
-	config Config
-	client searcher
+	direction int
 }
 
 // MigrateUp() performs the "up" migration, which includes creating/updating the index and migrating documents.
 func (m M) MigrateUp(config Config, index IndexFunc, documents documentsFunc) error {
 	t := Temp{
-		direction: directionUp,
+		Config: config,
+		Client: m.Client,
 
-		config: config,
-		client: m.Client,
+		direction: directionUp,
 	}
 
 	err := index(t)
@@ -284,10 +284,10 @@ func (m M) MigrateUp(config Config, index IndexFunc, documents documentsFunc) er
 // MigrateDown() performs the "down" migration, which includes deleting documents and the index.
 func (m M) MigrateDown(config Config, documents documentsFunc, index IndexFunc) error {
 	t := Temp{
-		direction: directionDown,
+		Config: config,
+		Client: m.Client,
 
-		config: config,
-		client: m.Client,
+		direction: directionDown,
 	}
 
 	err := documents(t)
@@ -316,13 +316,13 @@ func (i index) NoIndex() IndexFunc {
 func (i index) MigrateIndex() IndexFunc {
 	return func(t Temp) error {
 		if t.direction == directionUp {
-			err := t.client.CreateIndex(context.Background(), t.config.Name, utils.MarshalJSON(t.config.Definition))
+			err := t.Client.CreateIndex(context.Background(), t.Config.Name, utils.MarshalJSON(t.Config.Definition))
 			if err != nil {
 				return fmt.Errorf("%w\n%s", ErrMigratorMigratingIndex, err)
 			}
 			return nil
 		} else {
-			err := t.client.DeleteIndex(context.Background(), t.config.Name)
+			err := t.Client.DeleteIndex(context.Background(), t.Config.Name)
 			if err != nil {
 				return fmt.Errorf("%w\n%s", ErrMigratorMigratingIndex, err)
 			}
@@ -349,13 +349,13 @@ func (d documents) MigrateDocuments(origin OriginFunc) documentsFunc {
 				return fmt.Errorf("%w\n%v", ErrMigratorDocuments, err)
 			}
 
-			err = t.client.CreateDocuments(context.Background(), t.config.Name, docs)
+			err = t.Client.CreateDocuments(context.Background(), t.Config.Name, docs)
 			if err != nil {
 				return fmt.Errorf("%w\n%v", ErrMigratorDocuments, err)
 			}
 			return nil
 		} else {
-			err := t.client.DeleteDocuments(context.Background(), t.config.Name, `{"query": {"match_all": {}}}`)
+			err := t.Client.DeleteDocuments(context.Background(), t.Config.Name, `{"query": {"match_all": {}}}`)
 			if err != nil {
 				return fmt.Errorf("%w\n%v", ErrMigratorDocuments, err)
 			}

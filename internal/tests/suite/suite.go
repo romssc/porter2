@@ -20,11 +20,7 @@ type suite struct {
 	T *testing.T
 
 	Porter porter.M
-	Temp   temp
-}
-
-type temp struct {
-	config porter.Config
+	Temp   porter.Temp
 }
 
 type mockClient struct{}
@@ -109,8 +105,8 @@ func New(t *testing.T, offline bool) (*suite, error) {
 			T: t,
 
 			Porter: p,
-			Temp: temp{
-				config: porter.Config{Name: "porter"},
+			Temp: porter.Temp{
+				Config: porter.Config{Name: "porter"},
 			},
 		}, nil
 	}
@@ -121,8 +117,8 @@ func New(t *testing.T, offline bool) (*suite, error) {
 		T: t,
 
 		Porter: p,
-		Temp: temp{
-			config: porter.Config{Name: "porter"},
+		Temp: porter.Temp{
+			Config: porter.Config{Name: "porter"},
 		},
 	}, nil
 }
