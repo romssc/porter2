@@ -8,10 +8,6 @@ import (
 	"github.com/xoticdsign/porter/internal/tests/suite"
 )
 
-const (
-	location = "migrations/t.json"
-)
-
 func TestLocationFromFile_Functional(t *testing.T) {
 	s, err := suite.New(t, true)
 	if err != nil {
