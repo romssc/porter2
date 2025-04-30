@@ -9,7 +9,6 @@ import (
 	"strings"
 
 	"github.com/elastic/go-elasticsearch/v8"
-	"github.com/elastic/go-elasticsearch/v8/esapi"
 
 	"github.com/xoticdsign/porter/internal/utils"
 )
@@ -84,10 +83,10 @@ type origin struct {
 
 // searcher{} defines methods for interacting with Elasticsearch for index and document operations.
 type searcher interface {
-	CreateIndex(ctx context.Context, name string, body []byte) (*esapi.Response, error)
-	CreateDocuments(ctx context.Context, name string, documents []byte) (*esapi.Response, error)
-	DeleteIndex(ctx context.Context, name string) (*esapi.Response, error)
-	DeleteDocuments(ctx context.Context, name string, query string) (*esapi.Response, error)
+	CreateIndex(ctx context.Context, name string, body []byte) error
+	CreateDocuments(ctx context.Context, name string, documents []byte) error
+	DeleteIndex(ctx context.Context, name string) error
+	DeleteDocuments(ctx context.Context, name string, query string) error
 }
 
 // client{} wraps the Elasticsearch client and provides convenience methods for interacting with Elasticsearch.
@@ -96,61 +95,110 @@ type client struct {
 	*elasticsearch.Client
 }
 
-func (c client) CreateIndex(ctx context.Context, name string, body []byte) (*esapi.Response, error) {
+func (c client) CreateIndex(ctx context.Context, name string, body []byte) error {
 	resp, err := c.Indices.Create(
 		name,
 		c.Indices.Create.WithContext(ctx),
 		c.Indices.Create.WithBody(bytes.NewBuffer(body)),
 		c.Indices.Create.WithPretty(),
 	)
-	return resp, err
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	r, ok := utils.ExtractError(resp.Body)
+	if ok {
+		return fmt.Errorf(r)
+	}
+
+	return nil
 }
 
-func (c client) CreateDocuments(ctx context.Context, name string, documents []byte) (*esapi.Response, error) {
+func (c client) CreateDocuments(ctx context.Context, name string, documents []byte) error {
 	resp, err := c.Bulk(
 		bytes.NewBuffer(documents),
 		c.Bulk.WithContext(context.Background()),
 		c.Bulk.WithIndex(name),
 		c.Bulk.WithPretty(),
 	)
-	return resp, err
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	var r map[string]interface{}
+
+	json.NewDecoder(resp.Body).Decode(&r)
+
+	ok, _ := r["errors"].(bool)
+	if !ok {
+		return nil
+	}
+
+	items, ok := r["items"].([]interface{})
+	if !ok {
+		return nil
+	}
+
+	var errors []string
+
+	for _, item := range items {
+		m, ok := item.(map[string]interface{})
+		if !ok {
+			continue
+		}
+		for _, v := range m {
+			doc, ok := v.(map[string]interface{})
+			if !ok {
+				continue
+			}
+
+			err, ok := doc["error"].(map[string]interface{})
+			if ok {
+				errors = append(errors, err["reason"].(string))
+			}
+		}
+	}
+
+	return fmt.Errorf(strings.Join(errors, ", "))
 }
 
-func (c client) DeleteIndex(ctx context.Context, name string) (*esapi.Response, error) {
+func (c client) DeleteIndex(ctx context.Context, name string) error {
 	resp, err := c.Indices.Delete(
 		[]string{name},
 		c.Indices.Delete.WithContext(context.Background()),
 		c.Indices.Delete.WithPretty(),
 	)
-	return resp, err
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	r, ok := utils.ExtractError(resp.Body)
+	if ok {
+		return fmt.Errorf(r)
+	}
+	return nil
 }
 
-func (c client) DeleteDocuments(ctx context.Context, name string, query string) (*esapi.Response, error) {
+func (c client) DeleteDocuments(ctx context.Context, name string, query string) error {
 	resp, err := c.DeleteByQuery(
 		[]string{name},
 		strings.NewReader(query),
 		c.DeleteByQuery.WithContext(context.Background()),
 		c.DeleteByQuery.WithPretty(),
 	)
-	return resp, err
-}
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
 
-type mockClient struct{}
-
-func (m mockClient) CreateIndex(ctx context.Context, name string, body []byte) (*esapi.Response, error) {
-	return nil, nil
-}
-
-func (m mockClient) CreateDocuments(ctx context.Context, name string, documents []byte) (*esapi.Response, error) {
-	return nil, nil
-}
-
-func (m mockClient) DeleteIndex(ctx context.Context, name string) (*esapi.Response, error) {
-	return nil, nil
-}
-
-func (m mockClient) DeleteDocuments(ctx context.Context, name string, query string) (*esapi.Response, error) {
-	return nil, nil
+	r, ok := utils.ExtractError(resp.Body)
+	if ok {
+		return fmt.Errorf(r)
+	}
+	return nil
 }
 
 // New() initializes and returns a new migration object.
@@ -275,32 +323,18 @@ func (i index) MigrateIndex() indexFunc {
 		if t.direction == directionUp {
 			const op = "> MigrateIndex()"
 
-			resp, err := t.client.CreateIndex(context.Background(), t.config.Name, utils.MarshalJSON(t.config.Definition))
+			err := t.client.CreateIndex(context.Background(), t.config.Name, utils.MarshalJSON(t.config.Definition))
 			if err != nil {
-				return fmt.Errorf("%s.CreatedIndex() @ \n\n %v", op, err)
+				return fmt.Errorf("%s.CreateIndex() @ \n\n %v", op, err)
 			}
-			defer resp.Body.Close()
-
-			r, ok := utils.ExtractError(resp.Body)
-			if ok {
-				return fmt.Errorf("%s.CreateIndex() @ \n\n %v", op, r)
-			}
-
 			return nil
 		} else {
 			const op = "< MigrateIndex()"
 
-			resp, err := t.client.DeleteIndex(context.Background(), t.config.Name)
+			err := t.client.DeleteIndex(context.Background(), t.config.Name)
 			if err != nil {
 				return fmt.Errorf("%s.DeleteIndex() @ \n\n %v", op, err)
 			}
-			defer resp.Body.Close()
-
-			r, ok := utils.ExtractError(resp.Body)
-			if ok {
-				return fmt.Errorf("%s.DeleteIndex() @ \n\n %v", op, r)
-			}
-
 			return nil
 		}
 	}
@@ -332,62 +366,18 @@ func (d documents) MigrateDocuments(origin originFunc) documentsFunc {
 				}
 			}
 
-			resp, err := t.client.CreateDocuments(context.Background(), t.config.Name, docs)
+			err = t.client.CreateDocuments(context.Background(), t.config.Name, docs)
 			if err != nil {
 				return fmt.Errorf("%s.CreateDocuments() @ \n\n %v", op, err)
 			}
-			defer resp.Body.Close()
-
-			var r map[string]interface{}
-
-			json.NewDecoder(resp.Body).Decode(&r)
-
-			ok, _ := r["errors"].(bool)
-			if !ok {
-				return nil
-			}
-
-			items, ok := r["items"].([]interface{})
-			if !ok {
-				return nil
-			}
-
-			var errors []string
-
-			for _, item := range items {
-				m, ok := item.(map[string]interface{})
-				if !ok {
-					continue
-				}
-
-				for _, v := range m {
-					doc, ok := v.(map[string]interface{})
-					if !ok {
-						continue
-					}
-
-					err, ok := doc["error"].(map[string]interface{})
-					if ok {
-						errors = append(errors, err["reason"].(string))
-					}
-				}
-			}
-
-			return fmt.Errorf("%s.CreateDocuments() @ \n\n %v", op, r)
+			return nil
 		} else {
 			const op = "< MigrateDocuments()"
 
-			resp, err := t.client.DeleteDocuments(context.Background(), t.config.Name, `{"query": {"match_all": {}}}`)
+			err := t.client.DeleteDocuments(context.Background(), t.config.Name, `{"query": {"match_all": {}}}`)
 			if err != nil {
 				return fmt.Errorf("%s.DeleteDocuments() @ \n\n %v", op, err)
 			}
-			defer resp.Body.Close()
-
-			r, ok := utils.ExtractError(resp.Body)
-			if ok {
-				return fmt.Errorf("%s.DeleteDocuments() @ \n\n %v", op, r)
-			}
-
 			return nil
 		}
 	}

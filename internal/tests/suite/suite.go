@@ -10,7 +10,6 @@ import (
 	"time"
 
 	"github.com/elastic/go-elasticsearch/v8"
-	"github.com/elastic/go-elasticsearch/v8/esapi"
 	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/wait"
 
@@ -25,20 +24,20 @@ type suite struct {
 
 type mockClient struct{}
 
-func (m mockClient) CreateIndex(ctx context.Context, name string, body []byte) (*esapi.Response, error) {
-	return nil, nil
+func (m mockClient) CreateIndex(ctx context.Context, name string, body []byte) error {
+	return nil
 }
 
-func (m mockClient) CreateDocuments(ctx context.Context, name string, documents []byte) (*esapi.Response, error) {
-	return nil, nil
+func (m mockClient) CreateDocuments(ctx context.Context, name string, documents []byte) error {
+	return nil
 }
 
-func (m mockClient) DeleteIndex(ctx context.Context, name string) (*esapi.Response, error) {
-	return nil, nil
+func (m mockClient) DeleteIndex(ctx context.Context, name string) error {
+	return nil
 }
 
-func (m mockClient) DeleteDocuments(ctx context.Context, name string, query string) (*esapi.Response, error) {
-	return nil, nil
+func (m mockClient) DeleteDocuments(ctx context.Context, name string, query string) error {
+	return nil
 }
 
 type config struct {
