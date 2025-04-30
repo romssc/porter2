@@ -29,16 +29,16 @@ var (
 )
 
 type location struct {
-	FromFile locationFromFile
-	Generate locationGenerate
+	FromFile LocationFromFile
+	Generate LocationGenerate
 }
 
-type originFunc func(t temp) ([]byte, error)
+type OriginFunc func(t temp) ([]byte, error)
 
-type locationFromFile func(path string) originFunc
+type LocationFromFile func(path string) OriginFunc
 
-func newLocationFromFile() locationFromFile {
-	return func(path string) originFunc {
+func newLocationFromFile() LocationFromFile {
+	return func(path string) OriginFunc {
 		return func(t temp) ([]byte, error) {
 			contents, err := os.ReadFile(path)
 			if err != nil {
@@ -49,10 +49,10 @@ func newLocationFromFile() locationFromFile {
 	}
 }
 
-type locationGenerate func(amount int) originFunc
+type LocationGenerate func(amount int) OriginFunc
 
-func newLocationGenerate() locationGenerate {
-	return func(amount int) originFunc {
+func newLocationGenerate() LocationGenerate {
+	return func(amount int) OriginFunc {
 		return func(t temp) ([]byte, error) {
 			var docs []byte
 
