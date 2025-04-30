@@ -20,6 +20,8 @@ var (
 	ErrClientDeletingIndex     = fmt.Errorf("failed to delete index. elasticsearch client could not remove the specified index")
 	ErrClientDeletingDocuments = fmt.Errorf("failed to delete documents. delete-by-query operation did not complete successfullys")
 
+	ErrMigratingIndex = fmt.Errorf("failed to migrate an index")
+
 	ErrMigrateIndex     = fmt.Errorf("can't migrate an index...")
 	ErrMigrateDocuments = fmt.Errorf("can't migrate documents...")
 )
@@ -316,15 +318,13 @@ func (i index) MigrateIndex() indexFunc {
 		if t.direction == directionUp {
 			err := t.client.CreateIndex(context.Background(), t.config.Name, utils.MarshalJSON(t.config.Definition))
 			if err != nil {
-				return fmt.Errorf("%s.CreateIndex() @ \n\n %v", op, err)
+				return fmt.Errorf("%w: %s", ErrMigratingIndex, err)
 			}
 			return nil
 		} else {
-			const op = "< MigrateIndex()"
-
 			err := t.client.DeleteIndex(context.Background(), t.config.Name)
 			if err != nil {
-				return fmt.Errorf("%s.DeleteIndex() @ \n\n %v", op, err)
+				return fmt.Errorf("%w: %s", ErrMigratingIndex, err)
 			}
 			return nil
 		}
