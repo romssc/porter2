@@ -5,7 +5,7 @@ on:
       - main
       - dev
 jobs:
-  functional:
+  integration:
     name: Integration Tests
     runs-on: ubuntu-latest
     services:
@@ -34,3 +34,18 @@ jobs:
       - name: Run
         run: |
           go test -v --run _Integration ./internal/tests
+  functional:
+    name: Functional Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+      - name: Setup Golang
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.22.5'
+      - name: Install dependencies
+        run: go mod tidy
+      - name: Run
+        run: |
+          go test -v --run _Functional ./internal/tests
