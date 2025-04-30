@@ -40,19 +40,6 @@ func (m mockClient) DeleteDocuments(ctx context.Context, name string, query stri
 	return nil
 }
 
-type config struct {
-	Elasticsearch elasticsearchConfig `yaml:"elasticsearch"`
-
-	StartupTimeout     time.Duration `yaml:"startup_timeout"`
-	TerminationTimeout time.Duration `yaml:"termination_timeout"`
-}
-
-type elasticsearchConfig struct {
-	Image   string `yaml:"image"`
-	Port    string `yaml:"ports"`
-	Network string `yaml:"network"`
-}
-
 func New(t *testing.T, offline bool) (*suite, error) {
 	t.Helper()
 	t.Parallel()
