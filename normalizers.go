@@ -9,7 +9,6 @@ functions (e.g., WithCharFilter(), WithFilter()), producing a map structure comp
 */
 
 type normalizer struct {
-	// Custom normalizer.
 	Custom normalizerCustom
 }
 
