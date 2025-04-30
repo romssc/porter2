@@ -26,58 +26,46 @@ const (
 
 // M{} represents the migration object that holds information about index and document migration.
 type M struct {
-	// The index settings and mappings.
-	Index index
-	// The documents to be migrated.
+	Index     index
 	Documents documents
 
-	// Elasticsearch client for interacting with the server.
 	Client searcher
 }
 
 // index{} represents the settings and mappings of the index
 type index struct {
-	// Index settings like analysis and analyzers.
 	Settings settings
-	// Index mappings (field types and properties).
 	Mappings mappings
 }
 
 // settings{} represents the analysis settings of the index, including analyzers and normalizers
 type settings struct {
-	// The analysis configuration.
 	Analysis analysis
 }
 
 // analysis{} defines the analyzers and normalizers for the index.
 type analysis struct {
-	// Various analyzers for text processing.
-	Analyzer analyzer
-	// Normalizers to standardize text in the index.
+	Analyzer   analyzer
 	Normalizer normalizer
 }
 
 // mappings{} defines the properties of the index, i.e., the fields in the documents.
 type mappings struct {
-	// The fields of the index.
 	Properties properties
 }
 
 // properties{} defines various field types in the index.
 type properties struct {
-	// Field types defined for the index.
 	fields
 }
 
 // documents{} represents the documents that need to be migrated.
 type documents struct {
-	// The origin from which documents are sourced.
 	Origin origin
 }
 
 // origin{} represents the location or source of the documents.
 type origin struct {
-	// Different methods to retrieve or generate documents.
 	location
 }
 
@@ -91,7 +79,6 @@ type searcher interface {
 
 // client{} wraps the Elasticsearch client and provides convenience methods for interacting with Elasticsearch.
 type client struct {
-	// The underlying Elasticsearch client.
 	*elasticsearch.Client
 }
 
