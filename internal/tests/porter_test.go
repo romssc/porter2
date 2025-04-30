@@ -19,12 +19,12 @@ func TestMigrateUp_Integration(t *testing.T) {
 		in              porter.Config
 		inWithIndex     bool
 		inWithDocuments bool
-		expectedErr     error
+		expectedErr     bool
 	}{
 		{
 			name: "happy case",
 			in: porter.Config{
-				Name: "porter",
+				Name: "porter_happy",
 				Definition: porter.DefinitionConfig{
 					Settings: &porter.SettingsConfig{
 						NumberOfShards:   1,
@@ -55,43 +55,45 @@ func TestMigrateUp_Integration(t *testing.T) {
 			},
 			inWithIndex:     true,
 			inWithDocuments: true,
-			expectedErr:     nil,
+			expectedErr:     false,
 		},
 		{
-			name: "no index case",
+			name:            "empty config case",
+			in:              porter.Config{},
+			inWithIndex:     true,
+			inWithDocuments: true,
+			expectedErr:     true,
+		},
+		{
+			name: "invalid field mapping",
 			in: porter.Config{
-				Name: "porter",
+				Name: "porter_invalid_field",
 				Definition: porter.DefinitionConfig{
 					Settings: &porter.SettingsConfig{
 						NumberOfShards:   1,
 						NumberOfReplicas: 1,
-						Analysis: &porter.AnalysisConfig{
-							Analyzer: s.Porter.Index.Settings.Analysis.NewAnalyzer(s.Porter.Index.Settings.Analysis.Analyzer.Simple("analyzer")),
-							Normalizer: s.Porter.Index.Settings.Analysis.NewNormalizer(s.Porter.Index.Settings.Analysis.Normalizer.Custom(
-								"normalyzer",
-								s.Porter.Index.Settings.Analysis.Normalizer.Custom.WithFilter([]porter.NormalizerCustomFilter{porter.NormalizerCustomFilterASCIIFolding}),
-							)),
-						},
 					},
 					Mappings: &porter.MappingsConfig{
-						Properties: s.Porter.Index.Mappings.NewFields(
-							s.Porter.Index.Mappings.Properties.Keyword(
-								"keyword",
-								porter.FakeCity,
-								s.Porter.Index.Mappings.Properties.Keyword.WithStore(true),
-							),
-							s.Porter.Index.Mappings.Properties.Integer(
-								"integer",
-								porter.FakeIntegerInt,
-								s.Porter.Index.Mappings.Properties.Integer.WithStore(true),
-							),
-						),
+						Properties: map[string]interface{}{
+							"broken": map[string]interface{}{
+								"type": "invalid",
+							},
+						},
 					},
 				},
 			},
+			inWithIndex:     true,
+			inWithDocuments: false,
+			expectedErr:     true,
+		},
+		{
+			name: "no index and no documents case",
+			in: porter.Config{
+				Name: "porter_nothing",
+			},
 			inWithIndex:     false,
-			inWithDocuments: true,
-			expectedErr:     porter.ErrPorterMigratingUp,
+			inWithDocuments: false,
+			expectedErr:     false,
 		},
 	}
 
@@ -116,8 +118,12 @@ func TestMigrateUp_Integration(t *testing.T) {
 				assert.Fail(t, "wrong combination of migrate functions")
 			}
 
-			if err != nil {
-				assert.Equal(t, cs.expectedErr, err)
+			switch {
+			case cs.expectedErr:
+				assert.Error(t, err)
+
+			case !cs.expectedErr:
+				assert.NoError(t, err)
 			}
 		})
 	}
@@ -134,23 +140,67 @@ func TestMigrateDown_Integration(t *testing.T) {
 		in              porter.Config
 		inWithIndex     bool
 		inWithDocuments bool
-		expectedErr     error
+		expectedErr     bool
+
+		migratePrior bool
 	}{
 		{
 			name: "happy case",
 			in: porter.Config{
-				Name: "porter",
+				Name: "porter_happy",
 				Definition: porter.DefinitionConfig{
+					Settings: &porter.SettingsConfig{
+						NumberOfShards:   1,
+						NumberOfReplicas: 1,
+						Analysis: &porter.AnalysisConfig{
+							Analyzer: s.Porter.Index.Settings.Analysis.NewAnalyzer(s.Porter.Index.Settings.Analysis.Analyzer.Simple("analyzer")),
+							Normalizer: s.Porter.Index.Settings.Analysis.NewNormalizer(s.Porter.Index.Settings.Analysis.Normalizer.Custom(
+								"normalyzer",
+								s.Porter.Index.Settings.Analysis.Normalizer.Custom.WithFilter([]porter.NormalizerCustomFilter{porter.NormalizerCustomFilterASCIIFolding}),
+							)),
+						},
+					},
 					Mappings: &porter.MappingsConfig{
 						Properties: s.Porter.Index.Mappings.NewFields(
-							s.Porter.Index.Mappings.Properties.Keyword("keyword", porter.FakeCity),
+							s.Porter.Index.Mappings.Properties.Keyword(
+								"keyword",
+								porter.FakeCity,
+								s.Porter.Index.Mappings.Properties.Keyword.WithStore(true),
+							),
+							s.Porter.Index.Mappings.Properties.Integer(
+								"integer",
+								porter.FakeIntegerInt,
+								s.Porter.Index.Mappings.Properties.Integer.WithStore(true),
+							),
 						),
 					},
 				},
 			},
 			inWithIndex:     true,
 			inWithDocuments: true,
-			expectedErr:     nil,
+			expectedErr:     false,
+
+			migratePrior: true,
+		},
+		{
+			name: "no index and no documents case",
+			in: porter.Config{
+				Name: "porter_nothing",
+			},
+			inWithIndex:     false,
+			inWithDocuments: false,
+			expectedErr:     false,
+
+			migratePrior: true,
+		},
+		{
+			name: "non-existent index case",
+			in: porter.Config{
+				Name: "porter_non_existent",
+			},
+			inWithIndex:     true,
+			inWithDocuments: true,
+			expectedErr:     true,
 		},
 	}
 
@@ -158,9 +208,11 @@ func TestMigrateDown_Integration(t *testing.T) {
 		s.T.Run(cs.name, func(t *testing.T) {
 			var err error
 
-			err = s.Porter.MigrateUp(cs.in, s.Porter.Index.MigrateIndex(), s.Porter.Documents.MigrateDocuments(s.Porter.Documents.Origin.Generate(20)))
-			if err != nil {
-				assert.Equal(t, cs.expectedErr, err)
+			if cs.migratePrior {
+				err = s.Porter.MigrateUp(cs.in, s.Porter.Index.MigrateIndex(), s.Porter.Documents.MigrateDocuments(s.Porter.Documents.Origin.Generate(10)))
+				if err != nil {
+					assert.Equal(t, cs.expectedErr, err)
+				}
 			}
 
 			switch {
@@ -180,8 +232,12 @@ func TestMigrateDown_Integration(t *testing.T) {
 				assert.Fail(t, "wrong combination of migrate functions")
 			}
 
-			if err != nil {
-				assert.Equal(t, cs.expectedErr, err)
+			switch {
+			case cs.expectedErr:
+				assert.Error(t, err, err)
+
+			case !cs.expectedErr:
+				assert.NoError(t, err, err)
 			}
 		})
 	}
