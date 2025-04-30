@@ -25,7 +25,7 @@ with type-safe mappings and reusable, composable generation logic.
 */
 
 var (
-	ErrFromFile = fmt.Errorf("failed to migrate from file")
+	ErrOriginFromFile = fmt.Errorf("origin: failed to read documents from file")
 )
 
 type location struct {
@@ -42,7 +42,7 @@ func newLocationFromFile() locationFromFile {
 		return func(t temp) ([]byte, error) {
 			contents, err := os.ReadFile(path)
 			if err != nil {
-				return nil, fmt.Errorf("%w\n%v", ErrFromFile, err)
+				return nil, fmt.Errorf("%w\n%v", ErrOriginFromFile, err)
 			}
 			return contents, nil
 		}
