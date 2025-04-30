@@ -9,11 +9,11 @@ functions (e.g., WithCharFilter(), WithFilter()), producing a map structure comp
 */
 
 type normalizer struct {
-	Custom normalizerCustom
+	Custom NormalizerCustom
 }
 
 // NewNormalizer() takes a composed normalizer function and converts it into a map[string]interface{} structure compatible with Elasticsearch.
-func (a analysis) NewNormalizer(normalizer normalizerFunc) map[string]interface{} {
+func (a analysis) NewNormalizer(normalizer NormalizerFunc) map[string]interface{} {
 	r := map[string]interface{}{}
 
 	for k, v := range normalizer() {
@@ -23,15 +23,15 @@ func (a analysis) NewNormalizer(normalizer normalizerFunc) map[string]interface{
 	return r
 }
 
-type normalizerFunc func() map[string]interface{}
+type NormalizerFunc func() map[string]interface{}
 
 // CUSTOM NORMALIZER
 
-type normalizerCustomProperties func() map[string]interface{}
-type normalizerCustom func(name string, properties ...normalizerCustomProperties) normalizerFunc
+type NormalizerCustomProperties func() map[string]interface{}
+type NormalizerCustom func(name string, properties ...NormalizerCustomProperties) NormalizerFunc
 
-func newNormalizerCustom() normalizerCustom {
-	return func(name string, properties ...normalizerCustomProperties) normalizerFunc {
+func newNormalizerCustom() NormalizerCustom {
+	return func(name string, properties ...NormalizerCustomProperties) NormalizerFunc {
 		return func() map[string]interface{} {
 			r := map[string]interface{}{}
 
@@ -62,7 +62,7 @@ var (
 )
 
 // WithCharFilter() defines a list of character filters for the custom normalizer.
-func (c normalizerCustom) WithCharFilter(value []NormalizerCustomCharFilter) normalizerCustomProperties {
+func (c NormalizerCustom) WithCharFilter(value []NormalizerCustomCharFilter) NormalizerCustomProperties {
 	return func() map[string]interface{} {
 		return map[string]interface{}{
 			"char_filter": value,
@@ -93,7 +93,7 @@ var (
 )
 
 // WithFilter() defines a list of token filters to be used in the custom normalizer.
-func (c normalizerCustom) WithFilter(value []NormalizerCustomFilter) normalizerCustomProperties {
+func (c NormalizerCustom) WithFilter(value []NormalizerCustomFilter) NormalizerCustomProperties {
 	return func() map[string]interface{} {
 		return map[string]interface{}{
 			"filter": value,
