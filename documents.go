@@ -33,13 +33,13 @@ type location struct {
 	Generate LocationGenerate
 }
 
-type OriginFunc func(t temp) ([]byte, error)
+type OriginFunc func(t Temp) ([]byte, error)
 
 type LocationFromFile func(path string) OriginFunc
 
 func newLocationFromFile() LocationFromFile {
 	return func(path string) OriginFunc {
-		return func(t temp) ([]byte, error) {
+		return func(t Temp) ([]byte, error) {
 			contents, err := os.ReadFile(path)
 			if err != nil {
 				return nil, fmt.Errorf("%w\n%v", ErrOriginFromFile, err)
@@ -53,7 +53,7 @@ type LocationGenerate func(amount int) OriginFunc
 
 func newLocationGenerate() LocationGenerate {
 	return func(amount int) OriginFunc {
-		return func(t temp) ([]byte, error) {
+		return func(t Temp) ([]byte, error) {
 			var docs []byte
 
 			for c := 1; c <= amount; c++ {

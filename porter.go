@@ -251,8 +251,8 @@ func New(cc *elasticsearch.Client) M {
 	}
 }
 
-// temp{} represents temporary data during the migration process, including the direction (up or down).
-type temp struct {
+// Temp{} represents temporary data during the migration process, including the direction (up or down).
+type Temp struct {
 	direction int
 
 	config Config
@@ -260,8 +260,8 @@ type temp struct {
 }
 
 // MigrateUp() performs the "up" migration, which includes creating/updating the index and migrating documents.
-func (m M) MigrateUp(config Config, index indexFunc, documents documentsFunc) error {
-	t := temp{
+func (m M) MigrateUp(config Config, index IndexFunc, documents documentsFunc) error {
+	t := Temp{
 		direction: directionUp,
 
 		config: config,
@@ -282,8 +282,8 @@ func (m M) MigrateUp(config Config, index indexFunc, documents documentsFunc) er
 }
 
 // MigrateDown() performs the "down" migration, which includes deleting documents and the index.
-func (m M) MigrateDown(config Config, documents documentsFunc, index indexFunc) error {
-	t := temp{
+func (m M) MigrateDown(config Config, documents documentsFunc, index IndexFunc) error {
+	t := Temp{
 		direction: directionDown,
 
 		config: config,
@@ -303,18 +303,18 @@ func (m M) MigrateDown(config Config, documents documentsFunc, index indexFunc) 
 	return nil
 }
 
-type indexFunc func(t temp) error
+type IndexFunc func(t Temp) error
 
 // NoIndex() represents no operation for the index during migration (used for down migrations).
-func (i index) NoIndex() indexFunc {
-	return func(t temp) error {
+func (i index) NoIndex() IndexFunc {
+	return func(t Temp) error {
 		return nil
 	}
 }
 
 // MigrateIndex() migrates the index up or down, depending on the migration direction.
-func (i index) MigrateIndex() indexFunc {
-	return func(t temp) error {
+func (i index) MigrateIndex() IndexFunc {
+	return func(t Temp) error {
 		if t.direction == directionUp {
 			err := t.client.CreateIndex(context.Background(), t.config.Name, utils.MarshalJSON(t.config.Definition))
 			if err != nil {
@@ -331,18 +331,18 @@ func (i index) MigrateIndex() indexFunc {
 	}
 }
 
-type documentsFunc func(t temp) error
+type documentsFunc func(t Temp) error
 
 // NoDocuments() represents no operation for documents during migration (used for down migrations).
 func (d documents) NoDocuments() documentsFunc {
-	return func(t temp) error {
+	return func(t Temp) error {
 		return nil
 	}
 }
 
 // MigrateDocuments migrates the documents up or down, depending on the migration direction.
 func (d documents) MigrateDocuments(origin OriginFunc) documentsFunc {
-	return func(t temp) error {
+	return func(t Temp) error {
 		if t.direction == directionUp {
 			docs, err := origin(t)
 			if err != nil {
