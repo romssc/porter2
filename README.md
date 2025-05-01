@@ -1,10 +1,12 @@
-# porter
+# Porter
 
 **Porter** is a flexible and composable migration toolkit for Elasticsearch, written in Go. It helps developers define, manage, and test index definitions and synthetic document generation.
 
----
+```bash
+go get github.com/xoticdsign/porter
+```
 
-## ✨ Features
+## Features
 
 - ✅ **Composable migration API** for index and document operations
 - ⚙️ **Field-type factories** with fake data generators (`gofakeit`)
@@ -14,27 +16,30 @@
 - 🧪 **Test-friendly design** (can run with real or mock Elasticsearch)
 - 🔄 **Bidirectional migrations**: `.MigrateUp()` and `.MigrateDown()`
 
----
-
-## 📦 Installation
-
-```bash
-go get github.com/xoticdsign/porter
-```
-
-## 🧰 Usage
-
-### 1. Initialize Porter
+## Basic Usage
 
 ```go
 import (
-    "github.com/elastic/go-elasticsearch/v8"
-	"github.com/xoticdsign/porter"
+   "github.com/elastic/go-elasticsearch/v8"
+   "github.com/xoticdsign/porter"
 )
 
 func main() {
-    client, _ := es.NewDefaultClient()
-    migrator := porter.New(client)
+   cc, _ := es.NewDefaultClient()
+
+   p := porter.New(cc)
+
+   c := porter.Config{
+      Name: "porter",
+      Definition: porter.DefinitionConfig{
+         Mappings: &porter.MappingsConfig{
+            Properties: migrator.Index.Mappings.NewFields(
+               migrator.Index.Mappings.Properties.Keyword("city", porter.FakeCity),
+               migrator.Index.Mappings.Properties.Integer("age", porter.FakeIntegerInt),
+            ),
+         },
+      },
+   }
 }
 ```
 
@@ -42,35 +47,7 @@ func main() {
 
 ```go
 
-config := porter.Config{
-	Name: "my-index",
-	Definition: porter.DefinitionConfig{
-		Settings: &porter.SettingsConfig{
-			NumberOfShards:   1,
-			NumberOfReplicas: 0,
-			Analysis: &porter.AnalysisConfig{
-				Analyzer: migrator.Index.Settings.Analysis.NewAnalyzer(
-					migrator.Index.Settings.Analysis.Analyzer.Simple("my-analyzer"),
-				),
-				Normalizer: migrator.Index.Settings.Analysis.NewNormalizer(
-					migrator.Index.Settings.Analysis.Normalizer.Custom(
-						"my-normalizer",
-						migrator.Index.Settings.Analysis.Normalizer.Custom.WithFilter([]porter.NormalizerCustomFilter{
-							porter.NormalizerCustomFilterASCIIFolding,
-							porter.NormalizerCustomFilterLowercase,
-						}),
-					),
-				),
-			},
-		},
-		Mappings: &porter.MappingsConfig{
-			Properties: migrator.Index.Mappings.NewFields(
-				migrator.Index.Mappings.Properties.Keyword("city", porter.FakeCity),
-				migrator.Index.Mappings.Properties.Integer("age", porter.FakeIntegerInt),
-			),
-		},
-	},
-}
+
 ```
 
 ### 3. Migrate Up
