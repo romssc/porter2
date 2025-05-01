@@ -17,23 +17,23 @@ for Elasticsearch systems, ensuring compatibility with Elasticsearch's field map
 */
 
 type fields struct {
-	Keyword     fieldKeyword
-	Text        fieldText
-	Integer     fieldInteger
-	Long        fieldLong
-	Float       fieldFloat
-	Double      fieldDouble
-	Short       fieldShort
-	Byte        fieldByte
-	HalfFloat   fieldHalfFloat
-	ScaledFloat fieldScaledFloat
-	Date        fieldDate
-	Boolean     fieldBoolean
-	IP          fieldIP
+	Keyword     FieldKeyword
+	Text        FieldText
+	Integer     FieldInteger
+	Long        FieldLong
+	Float       FieldFloat
+	Double      FieldDouble
+	Short       FieldShort
+	Byte        FieldByte
+	HalfFloat   FieldHalfFloat
+	ScaledFloat FieldScaledFloat
+	Date        FieldDate
+	Boolean     FieldBoolean
+	IP          FieldIP
 }
 
 // NewFields() generates a map of field names and their corresponding values.
-func (m mappings) NewFields(fields ...fieldFunc) map[string]interface{} {
+func (m mappings) NewFields(fields ...FieldFunc) map[string]interface{} {
 	r := map[string]interface{}{}
 
 	for _, fn := range fields {
@@ -48,15 +48,15 @@ func (m mappings) NewFields(fields ...fieldFunc) map[string]interface{} {
 	return r
 }
 
-type fieldFunc func() map[string]interface{}
+type FieldFunc func() map[string]interface{}
 
 // KEYWORD
 
-type fieldKeywordProperties func() map[string]interface{}
-type fieldKeyword func(name string, fake Fake, properties ...fieldKeywordProperties) fieldFunc
+type FieldKeywordProperties func() map[string]interface{}
+type FieldKeyword func(name string, fake Fake, properties ...FieldKeywordProperties) FieldFunc
 
-func newFieldKeyword() fieldKeyword {
-	return func(name string, fake Fake, properties ...fieldKeywordProperties) fieldFunc {
+func newFieldKeyword() FieldKeyword {
+	return func(name string, fake Fake, properties ...FieldKeywordProperties) FieldFunc {
 		storeToGenerate(name, string(fake))
 
 		r := map[string]interface{}{}
@@ -80,8 +80,8 @@ func newFieldKeyword() fieldKeyword {
 	}
 }
 
-// WithDocValues() adds a "doc_values" property to a fieldKeyword.
-func (k fieldKeyword) WithDocValues(enabled bool) fieldKeywordProperties {
+// WithDocValues() adds a "doc_values" property to a FieldKeyword.
+func (k FieldKeyword) WithDocValues(enabled bool) FieldKeywordProperties {
 	return func() map[string]interface{} {
 		return map[string]interface{}{
 			"doc_values": enabled,
@@ -89,8 +89,8 @@ func (k fieldKeyword) WithDocValues(enabled bool) fieldKeywordProperties {
 	}
 }
 
-// WithEagerGlobalOrdinals() adds an "eager_global_ordinals" property to a fieldKeyword.
-func (k fieldKeyword) WithEagerGlobalOrdinals(enabled bool) fieldKeywordProperties {
+// WithEagerGlobalOrdinals() adds an "eager_global_ordinals" property to a FieldKeyword.
+func (k FieldKeyword) WithEagerGlobalOrdinals(enabled bool) FieldKeywordProperties {
 	return func() map[string]interface{} {
 		return map[string]interface{}{
 			"eager_global_ordinals": enabled,
@@ -100,8 +100,8 @@ func (k fieldKeyword) WithEagerGlobalOrdinals(enabled bool) fieldKeywordProperti
 
 /* TODO: WithField(...) */
 
-// WithIgnoreAbove() adds an "ignore_above" property to a fieldKeyword.
-func (k fieldKeyword) WithIgnoreAbove(value int) fieldKeywordProperties {
+// WithIgnoreAbove() adds an "ignore_above" property to a FieldKeyword.
+func (k FieldKeyword) WithIgnoreAbove(value int) FieldKeywordProperties {
 	return func() map[string]interface{} {
 		return map[string]interface{}{
 			"ignore_above": value,
@@ -109,8 +109,8 @@ func (k fieldKeyword) WithIgnoreAbove(value int) fieldKeywordProperties {
 	}
 }
 
-// WithIndex() adds an "index" property to a fieldKeyword.
-func (k fieldKeyword) WithIndex(enabled bool) fieldKeywordProperties {
+// WithIndex() adds an "index" property to a FieldKeyword.
+func (k FieldKeyword) WithIndex(enabled bool) FieldKeywordProperties {
 	return func() map[string]interface{} {
 		return map[string]interface{}{
 			"index": enabled,
@@ -124,8 +124,8 @@ func (k fieldKeyword) WithIndex(enabled bool) fieldKeywordProperties {
 
 /* TODO: WithNorms(...) */
 
-// WithNullValue() adds a "null_value" property to a fieldKeyword.
-func (k fieldKeyword) WithNullValue(value string) fieldKeywordProperties {
+// WithNullValue() adds a "null_value" property to a FieldKeyword.
+func (k FieldKeyword) WithNullValue(value string) FieldKeywordProperties {
 	return func() map[string]interface{} {
 		return map[string]interface{}{
 			"null_value": value,
@@ -137,8 +137,8 @@ func (k fieldKeyword) WithNullValue(value string) fieldKeywordProperties {
 
 /* TODO: WithScript(...) */
 
-// WithStore() adds a "store" property to a fieldKeyword.
-func (k fieldKeyword) WithStore(enabled bool) fieldKeywordProperties {
+// WithStore() adds a "store" property to a FieldKeyword.
+func (k FieldKeyword) WithStore(enabled bool) FieldKeywordProperties {
 	return func() map[string]interface{} {
 		return map[string]interface{}{
 			"store": enabled,
@@ -148,8 +148,8 @@ func (k fieldKeyword) WithStore(enabled bool) fieldKeywordProperties {
 
 /* TODO: WithSimilarity(...) */
 
-// WithNormalizer() adds a "normalizer" property to a fieldKeyword.
-func (k fieldKeyword) WithNormalizer(value string) fieldKeywordProperties {
+// WithNormalizer() adds a "normalizer" property to a FieldKeyword.
+func (k FieldKeyword) WithNormalizer(value string) FieldKeywordProperties {
 	return func() map[string]interface{} {
 		return map[string]interface{}{
 			"normalizer": value,
@@ -163,11 +163,11 @@ func (k fieldKeyword) WithNormalizer(value string) fieldKeywordProperties {
 
 // TEXT
 
-type fieldTextProperties func() map[string]interface{}
-type fieldText func(name string, fake Fake, properties ...fieldTextProperties) fieldFunc
+type FieldTextProperties func() map[string]interface{}
+type FieldText func(name string, fake Fake, properties ...FieldTextProperties) FieldFunc
 
-func newFieldText() fieldText {
-	return func(name string, fake Fake, properties ...fieldTextProperties) fieldFunc {
+func newFieldText() FieldText {
+	return func(name string, fake Fake, properties ...FieldTextProperties) FieldFunc {
 		storeToGenerate(name, string(fake))
 
 		r := map[string]interface{}{}
@@ -191,8 +191,8 @@ func newFieldText() fieldText {
 	}
 }
 
-// WithAnalyzer() adds an "analyzer" property to a fieldText.
-func (t fieldText) WithAnalyzer(value string) fieldTextProperties {
+// WithAnalyzer() adds an "analyzer" property to a FieldText.
+func (t FieldText) WithAnalyzer(value string) FieldTextProperties {
 	return func() map[string]interface{} {
 		return map[string]interface{}{
 			"analyzer": value,
@@ -200,8 +200,8 @@ func (t fieldText) WithAnalyzer(value string) fieldTextProperties {
 	}
 }
 
-// WithEagerGlobalOrdinals() adds an "eager_global_ordinals" property to a fieldText.
-func (t fieldText) WithEagerGlobalOrdinals(enabled bool) fieldTextProperties {
+// WithEagerGlobalOrdinals() adds an "eager_global_ordinals" property to a FieldText.
+func (t FieldText) WithEagerGlobalOrdinals(enabled bool) FieldTextProperties {
 	return func() map[string]interface{} {
 		return map[string]interface{}{
 			"eager_global_ordinals": enabled,
@@ -215,8 +215,8 @@ func (t fieldText) WithEagerGlobalOrdinals(enabled bool) fieldTextProperties {
 
 /* TODO: WithField(...) */
 
-// WithIndex() adds an "index" property to a fieldText.
-func (t fieldText) WithIndex(enabled bool) fieldTextProperties {
+// WithIndex() adds an "index" property to a FieldText.
+func (t FieldText) WithIndex(enabled bool) FieldTextProperties {
 	return func() map[string]interface{} {
 		return map[string]interface{}{
 			"index": enabled,
@@ -230,8 +230,8 @@ func (t fieldText) WithIndex(enabled bool) fieldTextProperties {
 
 /* TODO: WithIndexPhrases(...) */
 
-// WithNorms() adds a "norms" property to a fieldText.
-func (t fieldText) WithNorms(enabled bool) fieldTextProperties {
+// WithNorms() adds a "norms" property to a FieldText.
+func (t FieldText) WithNorms(enabled bool) FieldTextProperties {
 	return func() map[string]interface{} {
 		return map[string]interface{}{
 			"norms": enabled,
@@ -239,8 +239,8 @@ func (t fieldText) WithNorms(enabled bool) fieldTextProperties {
 	}
 }
 
-// WithPositionIncrementGap() adds a "position_increment_gap" property to a fieldText.
-func (t fieldText) WithPositionIncrementGap(value int) fieldTextProperties {
+// WithPositionIncrementGap() adds a "position_increment_gap" property to a FieldText.
+func (t FieldText) WithPositionIncrementGap(value int) FieldTextProperties {
 	return func() map[string]interface{} {
 		return map[string]interface{}{
 			"position_increment_gap": value,
@@ -248,8 +248,8 @@ func (t fieldText) WithPositionIncrementGap(value int) fieldTextProperties {
 	}
 }
 
-// WithStore() adds a "store" property to a fieldText.
-func (t fieldText) WithStore(enabled bool) fieldTextProperties {
+// WithStore() adds a "store" property to a FieldText.
+func (t FieldText) WithStore(enabled bool) FieldTextProperties {
 	return func() map[string]interface{} {
 		return map[string]interface{}{
 			"store": enabled,
@@ -257,8 +257,8 @@ func (t fieldText) WithStore(enabled bool) fieldTextProperties {
 	}
 }
 
-// WithSearchAnalyzer() adds a "search_analyzer" property to a fieldText.
-func (t fieldText) WithSearchAnalyzer(value string) fieldTextProperties {
+// WithSearchAnalyzer() adds a "search_analyzer" property to a FieldText.
+func (t FieldText) WithSearchAnalyzer(value string) FieldTextProperties {
 	return func() map[string]interface{} {
 		return map[string]interface{}{
 			"search_analyzer": value,
@@ -270,8 +270,8 @@ func (t fieldText) WithSearchAnalyzer(value string) fieldTextProperties {
 
 /* TODO: WithSimilarity(...) */
 
-// WithTermVector() adds a "term_vector" property to a fieldText.
-func (t fieldText) WithTermVector(value string) fieldTextProperties {
+// WithTermVector() adds a "term_vector" property to a FieldText.
+func (t FieldText) WithTermVector(value string) FieldTextProperties {
 	return func() map[string]interface{} {
 		return map[string]interface{}{
 			"term_vector": value,
@@ -283,11 +283,11 @@ func (t fieldText) WithTermVector(value string) fieldTextProperties {
 
 // INTEGER
 
-type fieldIntegerProperties func() map[string]interface{}
-type fieldInteger func(name string, fake FakeInteger, properties ...fieldIntegerProperties) fieldFunc
+type FieldIntegerProperties func() map[string]interface{}
+type FieldInteger func(name string, fake FakeInteger, properties ...FieldIntegerProperties) FieldFunc
 
-func newFieldInteger() fieldInteger {
-	return func(name string, fake FakeInteger, properties ...fieldIntegerProperties) fieldFunc {
+func newFieldInteger() FieldInteger {
+	return func(name string, fake FakeInteger, properties ...FieldIntegerProperties) FieldFunc {
 		storeToGenerate(name, string(fake))
 
 		r := map[string]interface{}{}
@@ -312,7 +312,7 @@ func newFieldInteger() fieldInteger {
 }
 
 // WithCoerce() adds a "coerce" property to an integer field.
-func (i fieldInteger) WithCoerce(enabled bool) fieldIntegerProperties {
+func (i FieldInteger) WithCoerce(enabled bool) FieldIntegerProperties {
 	return func() map[string]interface{} {
 		return map[string]interface{}{
 			"coerce": enabled,
@@ -321,7 +321,7 @@ func (i fieldInteger) WithCoerce(enabled bool) fieldIntegerProperties {
 }
 
 // WithDocValues() adds a "doc_values" property to an integer field.
-func (i fieldInteger) WithDocValues(enabled bool) fieldIntegerProperties {
+func (i FieldInteger) WithDocValues(enabled bool) FieldIntegerProperties {
 	return func() map[string]interface{} {
 		return map[string]interface{}{
 			"doc_values": enabled,
@@ -330,7 +330,7 @@ func (i fieldInteger) WithDocValues(enabled bool) fieldIntegerProperties {
 }
 
 // WithIgnoreMalformed() adds an "ignore_malformed" property to an integer field.
-func (i fieldInteger) WithIgnoreMalformed(enabled bool) fieldIntegerProperties {
+func (i FieldInteger) WithIgnoreMalformed(enabled bool) FieldIntegerProperties {
 	return func() map[string]interface{} {
 		return map[string]interface{}{
 			"ignore_malformed": enabled,
@@ -339,7 +339,7 @@ func (i fieldInteger) WithIgnoreMalformed(enabled bool) fieldIntegerProperties {
 }
 
 // WithIndex() adds an "index" property to an integer field.
-func (i fieldInteger) WithIndex(enabled bool) fieldIntegerProperties {
+func (i FieldInteger) WithIndex(enabled bool) FieldIntegerProperties {
 	return func() map[string]interface{} {
 		return map[string]interface{}{
 			"index": enabled,
@@ -350,7 +350,7 @@ func (i fieldInteger) WithIndex(enabled bool) fieldIntegerProperties {
 /* TODO: WithMeta(...) */
 
 // WithNullValue() adds a "null_value" property to an integer field.
-func (i fieldInteger) WithNullValue(value int) fieldIntegerProperties {
+func (i FieldInteger) WithNullValue(value int) FieldIntegerProperties {
 	return func() map[string]interface{} {
 		return map[string]interface{}{
 			"null_value": value,
@@ -363,7 +363,7 @@ func (i fieldInteger) WithNullValue(value int) fieldIntegerProperties {
 /* TODO: WithScript(...) */
 
 // WithStore() adds a "store" property to an integer field.
-func (i fieldInteger) WithStore(enabled bool) fieldIntegerProperties {
+func (i FieldInteger) WithStore(enabled bool) FieldIntegerProperties {
 	return func() map[string]interface{} {
 		return map[string]interface{}{
 			"store": enabled,
@@ -375,11 +375,11 @@ func (i fieldInteger) WithStore(enabled bool) fieldIntegerProperties {
 
 // LONG
 
-type fieldLongProperties func() map[string]interface{}
-type fieldLong func(name string, fake FakeLong, properties ...fieldLongProperties) fieldFunc
+type FieldLongProperties func() map[string]interface{}
+type FieldLong func(name string, fake FakeLong, properties ...FieldLongProperties) FieldFunc
 
-func newFieldLong() fieldLong {
-	return func(name string, fake FakeLong, properties ...fieldLongProperties) fieldFunc {
+func newFieldLong() FieldLong {
+	return func(name string, fake FakeLong, properties ...FieldLongProperties) FieldFunc {
 		storeToGenerate(name, string(fake))
 
 		r := map[string]interface{}{}
@@ -404,7 +404,7 @@ func newFieldLong() fieldLong {
 }
 
 // WithCoerce() adds a "coerce" property to a long field.
-func (l fieldLong) WithCoerce(enabled bool) fieldLongProperties {
+func (l FieldLong) WithCoerce(enabled bool) FieldLongProperties {
 	return func() map[string]interface{} {
 		return map[string]interface{}{
 			"coerce": enabled,
@@ -413,7 +413,7 @@ func (l fieldLong) WithCoerce(enabled bool) fieldLongProperties {
 }
 
 // WithDocValues() adds a "doc_values" property to a long field.
-func (l fieldLong) WithDocValues(enabled bool) fieldLongProperties {
+func (l FieldLong) WithDocValues(enabled bool) FieldLongProperties {
 	return func() map[string]interface{} {
 		return map[string]interface{}{
 			"doc_values": enabled,
@@ -422,7 +422,7 @@ func (l fieldLong) WithDocValues(enabled bool) fieldLongProperties {
 }
 
 // WithIgnoreMalformed() adds an "ignore_malformed" property to a long field.
-func (l fieldLong) WithIgnoreMalformed(enabled bool) fieldLongProperties {
+func (l FieldLong) WithIgnoreMalformed(enabled bool) FieldLongProperties {
 	return func() map[string]interface{} {
 		return map[string]interface{}{
 			"ignore_malformed": enabled,
@@ -431,7 +431,7 @@ func (l fieldLong) WithIgnoreMalformed(enabled bool) fieldLongProperties {
 }
 
 // WithIndex() adds an "index" property to a long field.
-func (l fieldLong) WithIndex(enabled bool) fieldLongProperties {
+func (l FieldLong) WithIndex(enabled bool) FieldLongProperties {
 	return func() map[string]interface{} {
 		return map[string]interface{}{
 			"index": enabled,
@@ -442,7 +442,7 @@ func (l fieldLong) WithIndex(enabled bool) fieldLongProperties {
 /* TODO: WithMeta(...) */
 
 // WithNullValue() adds a "null_value" property to a long field.
-func (l fieldLong) WithNullValue(value int) fieldLongProperties {
+func (l FieldLong) WithNullValue(value int) FieldLongProperties {
 	return func() map[string]interface{} {
 		return map[string]interface{}{
 			"null_value": value,
@@ -455,7 +455,7 @@ func (l fieldLong) WithNullValue(value int) fieldLongProperties {
 /* TODO: WithScript(...) */
 
 // WithStore() adds a "store" property to a long field.
-func (l fieldLong) WithStore(enabled bool) fieldLongProperties {
+func (l FieldLong) WithStore(enabled bool) FieldLongProperties {
 	return func() map[string]interface{} {
 		return map[string]interface{}{
 			"store": enabled,
@@ -467,11 +467,11 @@ func (l fieldLong) WithStore(enabled bool) fieldLongProperties {
 
 // FLOAT
 
-type fieldFloatProperties func() map[string]interface{}
-type fieldFloat func(name string, fake FakeFloats, properties ...fieldFloatProperties) fieldFunc
+type FieldFloatProperties func() map[string]interface{}
+type FieldFloat func(name string, fake FakeFloats, properties ...FieldFloatProperties) FieldFunc
 
-func newFieldFloat() fieldFloat {
-	return func(name string, fake FakeFloats, properties ...fieldFloatProperties) fieldFunc {
+func newFieldFloat() FieldFloat {
+	return func(name string, fake FakeFloats, properties ...FieldFloatProperties) FieldFunc {
 		storeToGenerate(name, string(fake))
 
 		r := map[string]interface{}{}
@@ -496,7 +496,7 @@ func newFieldFloat() fieldFloat {
 }
 
 // WithCoerce() adds a "coerce" property to a float field.
-func (f fieldFloat) WithCoerce(enabled bool) fieldFloatProperties {
+func (f FieldFloat) WithCoerce(enabled bool) FieldFloatProperties {
 	return func() map[string]interface{} {
 		return map[string]interface{}{
 			"coerce": enabled,
@@ -505,7 +505,7 @@ func (f fieldFloat) WithCoerce(enabled bool) fieldFloatProperties {
 }
 
 // WithDocValues() adds a "doc_values" property to a float field.
-func (f fieldFloat) WithDocValues(enabled bool) fieldFloatProperties {
+func (f FieldFloat) WithDocValues(enabled bool) FieldFloatProperties {
 	return func() map[string]interface{} {
 		return map[string]interface{}{
 			"doc_values": enabled,
@@ -514,7 +514,7 @@ func (f fieldFloat) WithDocValues(enabled bool) fieldFloatProperties {
 }
 
 // WithIgnoreMalformed() adds an "ignore_malformed" property to a float field.
-func (f fieldFloat) WithIgnoreMalformed(enabled bool) fieldFloatProperties {
+func (f FieldFloat) WithIgnoreMalformed(enabled bool) FieldFloatProperties {
 	return func() map[string]interface{} {
 		return map[string]interface{}{
 			"ignore_malformed": enabled,
@@ -523,7 +523,7 @@ func (f fieldFloat) WithIgnoreMalformed(enabled bool) fieldFloatProperties {
 }
 
 // WithIndex() adds an "index" property to a float field.
-func (f fieldFloat) WithIndex(enabled bool) fieldFloatProperties {
+func (f FieldFloat) WithIndex(enabled bool) FieldFloatProperties {
 	return func() map[string]interface{} {
 		return map[string]interface{}{
 			"index": enabled,
@@ -534,7 +534,7 @@ func (f fieldFloat) WithIndex(enabled bool) fieldFloatProperties {
 /* TODO: WithMeta(...) */
 
 // WithNullValue() adds a "null_value" property to a float field.
-func (f fieldFloat) WithNullValue(value int) fieldFloatProperties {
+func (f FieldFloat) WithNullValue(value int) FieldFloatProperties {
 	return func() map[string]interface{} {
 		return map[string]interface{}{
 			"null_value": value,
@@ -547,7 +547,7 @@ func (f fieldFloat) WithNullValue(value int) fieldFloatProperties {
 /* TODO: WithScript(...) */
 
 // WithStore() adds a "store" property to a float field.
-func (f fieldFloat) WithStore(enabled bool) fieldFloatProperties {
+func (f FieldFloat) WithStore(enabled bool) FieldFloatProperties {
 	return func() map[string]interface{} {
 		return map[string]interface{}{
 			"store": enabled,
@@ -559,11 +559,11 @@ func (f fieldFloat) WithStore(enabled bool) fieldFloatProperties {
 
 // DOUBLE
 
-type fieldDoubleProperties func() map[string]interface{}
-type fieldDouble func(name string, fake FakeDouble, properties ...fieldDoubleProperties) fieldFunc
+type FieldDoubleProperties func() map[string]interface{}
+type FieldDouble func(name string, fake FakeDouble, properties ...FieldDoubleProperties) FieldFunc
 
-func newFieldDouble() fieldDouble {
-	return func(name string, fake FakeDouble, properties ...fieldDoubleProperties) fieldFunc {
+func newFieldDouble() FieldDouble {
+	return func(name string, fake FakeDouble, properties ...FieldDoubleProperties) FieldFunc {
 		storeToGenerate(name, string(fake))
 
 		r := map[string]interface{}{}
@@ -588,7 +588,7 @@ func newFieldDouble() fieldDouble {
 }
 
 // WithCoerce() adds a "coerce" property to a double field.
-func (d fieldDouble) WithCoerce(enabled bool) fieldDoubleProperties {
+func (d FieldDouble) WithCoerce(enabled bool) FieldDoubleProperties {
 	return func() map[string]interface{} {
 		return map[string]interface{}{
 			"coerce": enabled,
@@ -597,7 +597,7 @@ func (d fieldDouble) WithCoerce(enabled bool) fieldDoubleProperties {
 }
 
 // WithDocValues() adds a "doc_values" property to a double field.
-func (d fieldDouble) WithDocValues(enabled bool) fieldDoubleProperties {
+func (d FieldDouble) WithDocValues(enabled bool) FieldDoubleProperties {
 	return func() map[string]interface{} {
 		return map[string]interface{}{
 			"doc_values": enabled,
@@ -606,7 +606,7 @@ func (d fieldDouble) WithDocValues(enabled bool) fieldDoubleProperties {
 }
 
 // WithIgnoreMalformed() adds an "ignore_malformed" property to a double field.
-func (d fieldDouble) WithIgnoreMalformed(enabled bool) fieldDoubleProperties {
+func (d FieldDouble) WithIgnoreMalformed(enabled bool) FieldDoubleProperties {
 	return func() map[string]interface{} {
 		return map[string]interface{}{
 			"ignore_malformed": enabled,
@@ -615,7 +615,7 @@ func (d fieldDouble) WithIgnoreMalformed(enabled bool) fieldDoubleProperties {
 }
 
 // WithIndex() adds an "index" property to a double field.
-func (d fieldDouble) WithIndex(enabled bool) fieldDoubleProperties {
+func (d FieldDouble) WithIndex(enabled bool) FieldDoubleProperties {
 	return func() map[string]interface{} {
 		return map[string]interface{}{
 			"index": enabled,
@@ -626,7 +626,7 @@ func (d fieldDouble) WithIndex(enabled bool) fieldDoubleProperties {
 /* TODO: WithMeta(...) */
 
 // WithNullValue() adds a "null_value" property to a double field.
-func (d fieldDouble) WithNullValue(value int) fieldDoubleProperties {
+func (d FieldDouble) WithNullValue(value int) FieldDoubleProperties {
 	return func() map[string]interface{} {
 		return map[string]interface{}{
 			"null_value": value,
@@ -639,7 +639,7 @@ func (d fieldDouble) WithNullValue(value int) fieldDoubleProperties {
 /* TODO: WithScript(...) */
 
 // WithStore() adds a "store" property to a double field.
-func (d fieldDouble) WithStore(enabled bool) fieldDoubleProperties {
+func (d FieldDouble) WithStore(enabled bool) FieldDoubleProperties {
 	return func() map[string]interface{} {
 		return map[string]interface{}{
 			"store": enabled,
@@ -651,11 +651,11 @@ func (d fieldDouble) WithStore(enabled bool) fieldDoubleProperties {
 
 // SHORT
 
-type fieldShortProperties func() map[string]interface{}
-type fieldShort func(name string, fake FakeShort, properties ...fieldShortProperties) fieldFunc
+type FieldShortProperties func() map[string]interface{}
+type FieldShort func(name string, fake FakeShort, properties ...FieldShortProperties) FieldFunc
 
-func newFieldShort() fieldShort {
-	return func(name string, fake FakeShort, properties ...fieldShortProperties) fieldFunc {
+func newFieldShort() FieldShort {
+	return func(name string, fake FakeShort, properties ...FieldShortProperties) FieldFunc {
 		storeToGenerate(name, string(fake))
 
 		r := map[string]interface{}{}
@@ -680,7 +680,7 @@ func newFieldShort() fieldShort {
 }
 
 // WithCoerce() adds a "coerce" property to a short field.
-func (s fieldShort) WithCoerce(enabled bool) fieldShortProperties {
+func (s FieldShort) WithCoerce(enabled bool) FieldShortProperties {
 	return func() map[string]interface{} {
 		return map[string]interface{}{
 			"coerce": enabled,
@@ -689,7 +689,7 @@ func (s fieldShort) WithCoerce(enabled bool) fieldShortProperties {
 }
 
 // WithDocValues() adds a "doc_values" property to a short field.
-func (s fieldShort) WithDocValues(enabled bool) fieldShortProperties {
+func (s FieldShort) WithDocValues(enabled bool) FieldShortProperties {
 	return func() map[string]interface{} {
 		return map[string]interface{}{
 			"doc_values": enabled,
@@ -698,7 +698,7 @@ func (s fieldShort) WithDocValues(enabled bool) fieldShortProperties {
 }
 
 // WithIgnoreMalformed() adds an "ignore_malformed" property to a short field.
-func (s fieldShort) WithIgnoreMalformed(enabled bool) fieldShortProperties {
+func (s FieldShort) WithIgnoreMalformed(enabled bool) FieldShortProperties {
 	return func() map[string]interface{} {
 		return map[string]interface{}{
 			"ignore_malformed": enabled,
@@ -707,7 +707,7 @@ func (s fieldShort) WithIgnoreMalformed(enabled bool) fieldShortProperties {
 }
 
 // WithIndex() adds an "index" property to a short field.
-func (s fieldShort) WithIndex(enabled bool) fieldShortProperties {
+func (s FieldShort) WithIndex(enabled bool) FieldShortProperties {
 	return func() map[string]interface{} {
 		return map[string]interface{}{
 			"index": enabled,
@@ -718,7 +718,7 @@ func (s fieldShort) WithIndex(enabled bool) fieldShortProperties {
 /* TODO: WithMeta(...) */
 
 // WithNullValue() adds a "null_value" property to a short field.
-func (s fieldShort) WithNullValue(value int) fieldShortProperties {
+func (s FieldShort) WithNullValue(value int) FieldShortProperties {
 	return func() map[string]interface{} {
 		return map[string]interface{}{
 			"null_value": value,
@@ -731,7 +731,7 @@ func (s fieldShort) WithNullValue(value int) fieldShortProperties {
 /* TODO: WithScript(...) */
 
 // WithStore() adds a "store" property to a short field.
-func (s fieldShort) WithStore(enabled bool) fieldShortProperties {
+func (s FieldShort) WithStore(enabled bool) FieldShortProperties {
 	return func() map[string]interface{} {
 		return map[string]interface{}{
 			"store": enabled,
@@ -743,11 +743,11 @@ func (s fieldShort) WithStore(enabled bool) fieldShortProperties {
 
 // BYTE
 
-type fieldByteProperties func() map[string]interface{}
-type fieldByte func(name string, fake FakeByte, properties ...fieldByteProperties) fieldFunc
+type FieldByteProperties func() map[string]interface{}
+type FieldByte func(name string, fake FakeByte, properties ...FieldByteProperties) FieldFunc
 
-func newFieldByte() fieldByte {
-	return func(name string, fake FakeByte, properties ...fieldByteProperties) fieldFunc {
+func newFieldByte() FieldByte {
+	return func(name string, fake FakeByte, properties ...FieldByteProperties) FieldFunc {
 		storeToGenerate(name, string(fake))
 
 		r := map[string]interface{}{}
@@ -772,7 +772,7 @@ func newFieldByte() fieldByte {
 }
 
 // WithCoerce() adds a "coerce" property to a byte field.
-func (b fieldByte) WithCoerce(enabled bool) fieldByteProperties {
+func (b FieldByte) WithCoerce(enabled bool) FieldByteProperties {
 	return func() map[string]interface{} {
 		return map[string]interface{}{
 			"coerce": enabled,
@@ -781,7 +781,7 @@ func (b fieldByte) WithCoerce(enabled bool) fieldByteProperties {
 }
 
 // WithDocValues() adds a "doc_values" property to a byte field.
-func (b fieldByte) WithDocValues(enabled bool) fieldByteProperties {
+func (b FieldByte) WithDocValues(enabled bool) FieldByteProperties {
 	return func() map[string]interface{} {
 		return map[string]interface{}{
 			"doc_values": enabled,
@@ -790,7 +790,7 @@ func (b fieldByte) WithDocValues(enabled bool) fieldByteProperties {
 }
 
 // WithIgnoreMalformed() adds an "ignore_malformed" property to a byte field.
-func (b fieldByte) WithIgnoreMalformed(enabled bool) fieldByteProperties {
+func (b FieldByte) WithIgnoreMalformed(enabled bool) FieldByteProperties {
 	return func() map[string]interface{} {
 		return map[string]interface{}{
 			"ignore_malformed": enabled,
@@ -799,7 +799,7 @@ func (b fieldByte) WithIgnoreMalformed(enabled bool) fieldByteProperties {
 }
 
 // WithIndex() adds an "index" property to a byte field.
-func (b fieldByte) WithIndex(enabled bool) fieldByteProperties {
+func (b FieldByte) WithIndex(enabled bool) FieldByteProperties {
 	return func() map[string]interface{} {
 		return map[string]interface{}{
 			"index": enabled,
@@ -810,7 +810,7 @@ func (b fieldByte) WithIndex(enabled bool) fieldByteProperties {
 /* TODO: WithMeta(...) */
 
 // WithNullValue() adds a "null_value" property to a byte field.
-func (b fieldByte) WithNullValue(value int) fieldByteProperties {
+func (b FieldByte) WithNullValue(value int) FieldByteProperties {
 	return func() map[string]interface{} {
 		return map[string]interface{}{
 			"null_value": value,
@@ -823,7 +823,7 @@ func (b fieldByte) WithNullValue(value int) fieldByteProperties {
 /* TODO: WithScript(...) */
 
 // WithStore() adds a "store" property to a byte field.
-func (b fieldByte) WithStore(enabled bool) fieldByteProperties {
+func (b FieldByte) WithStore(enabled bool) FieldByteProperties {
 	return func() map[string]interface{} {
 		return map[string]interface{}{
 			"store": enabled,
@@ -835,11 +835,11 @@ func (b fieldByte) WithStore(enabled bool) fieldByteProperties {
 
 // HALFFLOAT
 
-type fieldHalfFloatProperties func() map[string]interface{}
-type fieldHalfFloat func(name string, fake FakeHalfFloat, properties ...fieldHalfFloatProperties) fieldFunc
+type FieldHalfFloatProperties func() map[string]interface{}
+type FieldHalfFloat func(name string, fake FakeHalfFloat, properties ...FieldHalfFloatProperties) FieldFunc
 
-func newFieldHalfFloat() fieldHalfFloat {
-	return func(name string, fake FakeHalfFloat, properties ...fieldHalfFloatProperties) fieldFunc {
+func newFieldHalfFloat() FieldHalfFloat {
+	return func(name string, fake FakeHalfFloat, properties ...FieldHalfFloatProperties) FieldFunc {
 		storeToGenerate(name, string(fake))
 
 		r := map[string]interface{}{}
@@ -864,7 +864,7 @@ func newFieldHalfFloat() fieldHalfFloat {
 }
 
 // WithCoerce() adds a "coerce" property to a half_float field.
-func (h fieldHalfFloat) WithCoerce(enabled bool) fieldHalfFloatProperties {
+func (h FieldHalfFloat) WithCoerce(enabled bool) FieldHalfFloatProperties {
 	return func() map[string]interface{} {
 		return map[string]interface{}{
 			"coerce": enabled,
@@ -873,7 +873,7 @@ func (h fieldHalfFloat) WithCoerce(enabled bool) fieldHalfFloatProperties {
 }
 
 // WithDocValues() adds a "doc_values" property to a half_float field.
-func (h fieldHalfFloat) WithDocValues(enabled bool) fieldHalfFloatProperties {
+func (h FieldHalfFloat) WithDocValues(enabled bool) FieldHalfFloatProperties {
 	return func() map[string]interface{} {
 		return map[string]interface{}{
 			"doc_values": enabled,
@@ -882,7 +882,7 @@ func (h fieldHalfFloat) WithDocValues(enabled bool) fieldHalfFloatProperties {
 }
 
 // WithIgnoreMalformed() adds an "ignore_malformed" property to a half_float field.
-func (h fieldHalfFloat) WithIgnoreMalformed(enabled bool) fieldHalfFloatProperties {
+func (h FieldHalfFloat) WithIgnoreMalformed(enabled bool) FieldHalfFloatProperties {
 	return func() map[string]interface{} {
 		return map[string]interface{}{
 			"ignore_malformed": enabled,
@@ -891,7 +891,7 @@ func (h fieldHalfFloat) WithIgnoreMalformed(enabled bool) fieldHalfFloatProperti
 }
 
 // WithIndex() adds an "index" property to a half_float field.
-func (h fieldHalfFloat) WithIndex(enabled bool) fieldHalfFloatProperties {
+func (h FieldHalfFloat) WithIndex(enabled bool) FieldHalfFloatProperties {
 	return func() map[string]interface{} {
 		return map[string]interface{}{
 			"index": enabled,
@@ -902,7 +902,7 @@ func (h fieldHalfFloat) WithIndex(enabled bool) fieldHalfFloatProperties {
 /* TODO: WithMeta(...) */
 
 // WithNullValue() adds a "null_value" property to a half_float field.
-func (h fieldHalfFloat) WithNullValue(value int) fieldHalfFloatProperties {
+func (h FieldHalfFloat) WithNullValue(value int) FieldHalfFloatProperties {
 	return func() map[string]interface{} {
 		return map[string]interface{}{
 			"null_value": value,
@@ -915,7 +915,7 @@ func (h fieldHalfFloat) WithNullValue(value int) fieldHalfFloatProperties {
 /* TODO: WithScript(...) */
 
 // WithStore() adds a "store" property to a half_float field.
-func (h fieldHalfFloat) WithStore(enabled bool) fieldHalfFloatProperties {
+func (h FieldHalfFloat) WithStore(enabled bool) FieldHalfFloatProperties {
 	return func() map[string]interface{} {
 		return map[string]interface{}{
 			"store": enabled,
@@ -927,11 +927,11 @@ func (h fieldHalfFloat) WithStore(enabled bool) fieldHalfFloatProperties {
 
 // SCALEDFLOAT
 
-type fieldScaledFloatProperties func() map[string]interface{}
-type fieldScaledFloat func(name string, fake FakeScaledFloat, properties ...fieldScaledFloatProperties) fieldFunc
+type FieldScaledFloatProperties func() map[string]interface{}
+type FieldScaledFloat func(name string, fake FakeScaledFloat, properties ...FieldScaledFloatProperties) FieldFunc
 
-func newFieldScaledFloat() fieldScaledFloat {
-	return func(name string, fake FakeScaledFloat, properties ...fieldScaledFloatProperties) fieldFunc {
+func newFieldScaledFloat() FieldScaledFloat {
+	return func(name string, fake FakeScaledFloat, properties ...FieldScaledFloatProperties) FieldFunc {
 		storeToGenerate(name, string(fake))
 
 		r := map[string]interface{}{}
@@ -956,7 +956,7 @@ func newFieldScaledFloat() fieldScaledFloat {
 }
 
 // WithCoerce() adds a "coerce" property to a scaled_float field.
-func (s fieldScaledFloat) WithCoerce(enabled bool) fieldScaledFloatProperties {
+func (s FieldScaledFloat) WithCoerce(enabled bool) FieldScaledFloatProperties {
 	return func() map[string]interface{} {
 		return map[string]interface{}{
 			"coerce": enabled,
@@ -965,7 +965,7 @@ func (s fieldScaledFloat) WithCoerce(enabled bool) fieldScaledFloatProperties {
 }
 
 // WithDocValues() adds a "doc_values" property to a scaled_float field.
-func (s fieldScaledFloat) WithDocValues(enabled bool) fieldScaledFloatProperties {
+func (s FieldScaledFloat) WithDocValues(enabled bool) FieldScaledFloatProperties {
 	return func() map[string]interface{} {
 		return map[string]interface{}{
 			"doc_values": enabled,
@@ -974,7 +974,7 @@ func (s fieldScaledFloat) WithDocValues(enabled bool) fieldScaledFloatProperties
 }
 
 // WithIgnoreMalformed() adds an "ignore_malformed" property to a scaled_float field.
-func (s fieldScaledFloat) WithIgnoreMalformed(enabled bool) fieldScaledFloatProperties {
+func (s FieldScaledFloat) WithIgnoreMalformed(enabled bool) FieldScaledFloatProperties {
 	return func() map[string]interface{} {
 		return map[string]interface{}{
 			"ignore_malformed": enabled,
@@ -983,7 +983,7 @@ func (s fieldScaledFloat) WithIgnoreMalformed(enabled bool) fieldScaledFloatProp
 }
 
 // WithIndex() adds an "index" property to a scaled_float field.
-func (s fieldScaledFloat) WithIndex(enabled bool) fieldScaledFloatProperties {
+func (s FieldScaledFloat) WithIndex(enabled bool) FieldScaledFloatProperties {
 	return func() map[string]interface{} {
 		return map[string]interface{}{
 			"index": enabled,
@@ -994,7 +994,7 @@ func (s fieldScaledFloat) WithIndex(enabled bool) fieldScaledFloatProperties {
 /* TODO: WithMeta(...) */
 
 // WithNullValue() adds a "null_value" property to a scaled_float field.
-func (s fieldScaledFloat) WithNullValue(value int) fieldScaledFloatProperties {
+func (s FieldScaledFloat) WithNullValue(value int) FieldScaledFloatProperties {
 	return func() map[string]interface{} {
 		return map[string]interface{}{
 			"null_value": value,
@@ -1007,7 +1007,7 @@ func (s fieldScaledFloat) WithNullValue(value int) fieldScaledFloatProperties {
 /* TODO: WithScript(...) */
 
 // WithStore() adds a "store" property to a scaled_float field.
-func (s fieldScaledFloat) WithStore(enabled bool) fieldScaledFloatProperties {
+func (s FieldScaledFloat) WithStore(enabled bool) FieldScaledFloatProperties {
 	return func() map[string]interface{} {
 		return map[string]interface{}{
 			"store": enabled,
@@ -1019,11 +1019,11 @@ func (s fieldScaledFloat) WithStore(enabled bool) fieldScaledFloatProperties {
 
 // DATE
 
-type fieldDateProperties func() map[string]interface{}
-type fieldDate func(name string, fake FakeDates, properties ...fieldDateProperties) fieldFunc
+type FieldDateProperties func() map[string]interface{}
+type FieldDate func(name string, fake FakeDates, properties ...FieldDateProperties) FieldFunc
 
-func newFieldDate() fieldDate {
-	return func(name string, fake FakeDates, properties ...fieldDateProperties) fieldFunc {
+func newFieldDate() FieldDate {
+	return func(name string, fake FakeDates, properties ...FieldDateProperties) FieldFunc {
 		storeToGenerate(name, string(fake))
 
 		r := map[string]interface{}{}
@@ -1048,7 +1048,7 @@ func newFieldDate() fieldDate {
 }
 
 // WithDocValues() adds a "doc_values" property to a date field.
-func (d fieldDate) WithDocValues(enabled bool) fieldDateProperties {
+func (d FieldDate) WithDocValues(enabled bool) FieldDateProperties {
 	return func() map[string]interface{} {
 		return map[string]interface{}{
 			"doc_values": enabled,
@@ -1057,7 +1057,7 @@ func (d fieldDate) WithDocValues(enabled bool) fieldDateProperties {
 }
 
 // WithFormat() adds a "format" property to a date field.
-func (d fieldDate) WithFormat(value string) fieldDateProperties {
+func (d FieldDate) WithFormat(value string) FieldDateProperties {
 	return func() map[string]interface{} {
 		return map[string]interface{}{
 			"format": value,
@@ -1068,7 +1068,7 @@ func (d fieldDate) WithFormat(value string) fieldDateProperties {
 /* TODO: WithLocale(...) */
 
 // WithIgnoreMalformed() adds an "ignore_malformed" property to a date field.
-func (d fieldDate) WithIgnoreMalformed(enabled bool) fieldDateProperties {
+func (d FieldDate) WithIgnoreMalformed(enabled bool) FieldDateProperties {
 	return func() map[string]interface{} {
 		return map[string]interface{}{
 			"ignore_malformed": enabled,
@@ -1077,7 +1077,7 @@ func (d fieldDate) WithIgnoreMalformed(enabled bool) fieldDateProperties {
 }
 
 // WithIndex() adds an "index" property to a date field.
-func (d fieldDate) WithIndex(enabled bool) fieldDateProperties {
+func (d FieldDate) WithIndex(enabled bool) FieldDateProperties {
 	return func() map[string]interface{} {
 		return map[string]interface{}{
 			"index": enabled,
@@ -1092,7 +1092,7 @@ func (d fieldDate) WithIndex(enabled bool) fieldDateProperties {
 /* TODO: WithScript(...) */
 
 // WithStore() adds a "store" property to a date field.
-func (d fieldDate) WithStore(enabled bool) fieldDateProperties {
+func (d FieldDate) WithStore(enabled bool) FieldDateProperties {
 	return func() map[string]interface{} {
 		return map[string]interface{}{
 			"store": enabled,
@@ -1104,11 +1104,11 @@ func (d fieldDate) WithStore(enabled bool) fieldDateProperties {
 
 // BOOLEAN
 
-type fieldBooleanProperties func() map[string]interface{}
-type fieldBoolean func(name string, fake FakeBoolean, properties ...fieldBooleanProperties) fieldFunc
+type FieldBooleanProperties func() map[string]interface{}
+type FieldBoolean func(name string, fake FakeBoolean, properties ...FieldBooleanProperties) FieldFunc
 
-func newFieldBoolean() fieldBoolean {
-	return func(name string, fake FakeBoolean, properties ...fieldBooleanProperties) fieldFunc {
+func newFieldBoolean() FieldBoolean {
+	return func(name string, fake FakeBoolean, properties ...FieldBooleanProperties) FieldFunc {
 		storeToGenerate(name, string(fake))
 
 		r := map[string]interface{}{}
@@ -1133,7 +1133,7 @@ func newFieldBoolean() fieldBoolean {
 }
 
 // WithDocValues() adds a "doc_values" property to a boolean field.
-func (b fieldBoolean) WithDocValues(enabled bool) fieldBooleanProperties {
+func (b FieldBoolean) WithDocValues(enabled bool) FieldBooleanProperties {
 	return func() map[string]interface{} {
 		return map[string]interface{}{
 			"doc_values": enabled,
@@ -1142,7 +1142,7 @@ func (b fieldBoolean) WithDocValues(enabled bool) fieldBooleanProperties {
 }
 
 // WithIndex() adds an "index" property to a boolean field.
-func (b fieldBoolean) WithIndex(enabled bool) fieldBooleanProperties {
+func (b FieldBoolean) WithIndex(enabled bool) FieldBooleanProperties {
 	return func() map[string]interface{} {
 		return map[string]interface{}{
 			"index": enabled,
@@ -1153,7 +1153,7 @@ func (b fieldBoolean) WithIndex(enabled bool) fieldBooleanProperties {
 /* TODO: WithIgnoreMalformed(...) */
 
 // WithNullValue() adds a "null_value" property to a boolean field.
-func (b fieldBoolean) WithNullValue(value bool) fieldBooleanProperties {
+func (b FieldBoolean) WithNullValue(value bool) FieldBooleanProperties {
 	return func() map[string]interface{} {
 		return map[string]interface{}{
 			"null_value": value,
@@ -1166,7 +1166,7 @@ func (b fieldBoolean) WithNullValue(value bool) fieldBooleanProperties {
 /* TODO: WithScript(...) */
 
 // WithStore() adds a "store" property to a boolean field.
-func (b fieldBoolean) WithStore(enabled bool) fieldBooleanProperties {
+func (b FieldBoolean) WithStore(enabled bool) FieldBooleanProperties {
 	return func() map[string]interface{} {
 		return map[string]interface{}{
 			"store": enabled,
@@ -1180,11 +1180,11 @@ func (b fieldBoolean) WithStore(enabled bool) fieldBooleanProperties {
 
 // IP
 
-type fieldIPProperties func() map[string]interface{}
-type fieldIP func(name string, fake FakeIP, properties ...fieldIPProperties) fieldFunc
+type FieldIPProperties func() map[string]interface{}
+type FieldIP func(name string, fake FakeIP, properties ...FieldIPProperties) FieldFunc
 
-func newFieldIP() fieldIP {
-	return func(name string, fake FakeIP, properties ...fieldIPProperties) fieldFunc {
+func newFieldIP() FieldIP {
+	return func(name string, fake FakeIP, properties ...FieldIPProperties) FieldFunc {
 		storeToGenerate(name, string(fake))
 
 		r := map[string]interface{}{}
@@ -1209,7 +1209,7 @@ func newFieldIP() fieldIP {
 }
 
 // WithDocValues() adds a "doc_values" property to an IP field.
-func (i fieldIP) WithDocValues(enabled bool) fieldIPProperties {
+func (i FieldIP) WithDocValues(enabled bool) FieldIPProperties {
 	return func() map[string]interface{} {
 		return map[string]interface{}{
 			"doc_values": enabled,
@@ -1220,7 +1220,7 @@ func (i fieldIP) WithDocValues(enabled bool) fieldIPProperties {
 /* TODO: WithIgnoreMalformed(...) */
 
 // WithIndex() adds an "index" property to an IP field.
-func (i fieldIP) WithIndex(enabled bool) fieldIPProperties {
+func (i FieldIP) WithIndex(enabled bool) FieldIPProperties {
 	return func() map[string]interface{} {
 		return map[string]interface{}{
 			"index": enabled,
@@ -1229,7 +1229,7 @@ func (i fieldIP) WithIndex(enabled bool) fieldIPProperties {
 }
 
 // WithNullValue() adds a "null_value" property to an IP field.
-func (i fieldIP) WithNullValue(value string) fieldIPProperties {
+func (i FieldIP) WithNullValue(value string) FieldIPProperties {
 	return func() map[string]interface{} {
 		return map[string]interface{}{
 			"null_value": value,
@@ -1242,7 +1242,7 @@ func (i fieldIP) WithNullValue(value string) fieldIPProperties {
 /* TODO: WithScript(...) */
 
 // WithStore() adds a "store" property to an IP field.
-func (i fieldIP) WithStore(enabled bool) fieldIPProperties {
+func (i FieldIP) WithStore(enabled bool) FieldIPProperties {
 	return func() map[string]interface{} {
 		return map[string]interface{}{
 			"store": enabled,
