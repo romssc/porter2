@@ -16,19 +16,19 @@ functions, which are ultimately compiled to Elasticsearch-compatible JSON object
 */
 
 type analyzer struct {
-	Standart    analyzerStandard
-	Simple      analyzerSimple
-	Whitespace  analyzerWhitespace
-	Stop        analyzerStop
-	Keyword     analyzerKeyword
-	Pattern     analyzerPattern
-	Language    analyzerLanguage
-	Fingerprint analyzerFingerprint
-	Custom      analyzerCustom
+	Standart    AnalyzerStandard
+	Simple      AnalyzerSimple
+	Whitespace  AnalyzerWhitespace
+	Stop        AnalyzerStop
+	Keyword     AnalyzerKeyword
+	Pattern     AnalyzerPattern
+	Language    AnalyzerLanguage
+	Fingerprint AnalyzerFingerprint
+	Custom      AnalyzerCustom
 }
 
-// NewAnalyzer() applies an analyzerFunc to return a map structure used in Elasticsearch settings.
-func (a analysis) NewAnalyzer(analyzer analyzerFunc) map[string]interface{} {
+// NewAnalyzer() applies an AnalyzerFunc to return a map structure used in Elasticsearch settings.
+func (a analysis) NewAnalyzer(analyzer AnalyzerFunc) map[string]interface{} {
 	r := map[string]interface{}{}
 
 	for k, v := range analyzer() {
@@ -38,15 +38,15 @@ func (a analysis) NewAnalyzer(analyzer analyzerFunc) map[string]interface{} {
 	return r
 }
 
-type analyzerFunc func() map[string]interface{}
+type AnalyzerFunc func() map[string]interface{}
 
 // STANDART ANALYZER
 
-type analyzerStandardProperties func() map[string]interface{}
-type analyzerStandard func(name string, properties ...analyzerStandardProperties) analyzerFunc
+type AnalyzerStandardProperties func() map[string]interface{}
+type AnalyzerStandard func(name string, properties ...AnalyzerStandardProperties) AnalyzerFunc
 
-func newAnalyzerStandard() analyzerStandard {
-	return func(name string, properties ...analyzerStandardProperties) analyzerFunc {
+func newAnalyzerStandard() AnalyzerStandard {
+	return func(name string, properties ...AnalyzerStandardProperties) AnalyzerFunc {
 		return func() map[string]interface{} {
 			r := map[string]interface{}{}
 
@@ -69,7 +69,7 @@ func newAnalyzerStandard() analyzerStandard {
 }
 
 // WithMaxTokenLength() sets the max_token_length for the standard analyzer.
-func (s analyzerStandard) WithMaxTokenLength(value int) analyzerStandardProperties {
+func (s AnalyzerStandard) WithMaxTokenLength(value int) AnalyzerStandardProperties {
 	return func() map[string]interface{} {
 		return map[string]interface{}{
 			"max_token_length": value,
@@ -78,7 +78,7 @@ func (s analyzerStandard) WithMaxTokenLength(value int) analyzerStandardProperti
 }
 
 // WithStopwords() sets the stopwords for the standard analyzer.
-func (s analyzerStandard) WithStopwords(value []string) analyzerStandardProperties {
+func (s AnalyzerStandard) WithStopwords(value []string) AnalyzerStandardProperties {
 	return func() map[string]interface{} {
 		return map[string]interface{}{
 			"stopwords": value,
@@ -87,7 +87,7 @@ func (s analyzerStandard) WithStopwords(value []string) analyzerStandardProperti
 }
 
 // WithStopwordsPath() sets an external stopwords file path.
-func (s analyzerStandard) WithStopwordsPath(value string) analyzerStandardProperties {
+func (s AnalyzerStandard) WithStopwordsPath(value string) AnalyzerStandardProperties {
 	return func() map[string]interface{} {
 		return map[string]interface{}{
 			"stopwords_path": value,
@@ -97,10 +97,10 @@ func (s analyzerStandard) WithStopwordsPath(value string) analyzerStandardProper
 
 // SIMPLE ANALYZER
 
-type analyzerSimple func(name string) analyzerFunc
+type AnalyzerSimple func(name string) AnalyzerFunc
 
-func newAnalyzerSimple() analyzerSimple {
-	return func(name string) analyzerFunc {
+func newAnalyzerSimple() AnalyzerSimple {
+	return func(name string) AnalyzerFunc {
 		return func() map[string]interface{} {
 			r := map[string]interface{}{}
 
@@ -115,10 +115,10 @@ func newAnalyzerSimple() analyzerSimple {
 
 // WHITESPACE ANALYZER
 
-type analyzerWhitespace func(name string) analyzerFunc
+type AnalyzerWhitespace func(name string) AnalyzerFunc
 
-func newAnalyzerWhitespace() analyzerWhitespace {
-	return func(name string) analyzerFunc {
+func newAnalyzerWhitespace() AnalyzerWhitespace {
+	return func(name string) AnalyzerFunc {
 		return func() map[string]interface{} {
 			r := map[string]interface{}{}
 
@@ -133,11 +133,11 @@ func newAnalyzerWhitespace() analyzerWhitespace {
 
 // STOP ANALYZER
 
-type analyzerStopProperties func() map[string]interface{}
-type analyzerStop func(name string, properties ...analyzerStopProperties) analyzerFunc
+type AnalyzerStopProperties func() map[string]interface{}
+type AnalyzerStop func(name string, properties ...AnalyzerStopProperties) AnalyzerFunc
 
-func newAnalyzerStop() analyzerStop {
-	return func(name string, properties ...analyzerStopProperties) analyzerFunc {
+func newAnalyzerStop() AnalyzerStop {
+	return func(name string, properties ...AnalyzerStopProperties) AnalyzerFunc {
 		return func() map[string]interface{} {
 			r := map[string]interface{}{}
 
@@ -160,7 +160,7 @@ func newAnalyzerStop() analyzerStop {
 }
 
 // WithStopwords() sets the stopwords for the standard analyzer.
-func (s analyzerStop) WithStopwords(value []string) analyzerStopProperties {
+func (s AnalyzerStop) WithStopwords(value []string) AnalyzerStopProperties {
 	return func() map[string]interface{} {
 		return map[string]interface{}{
 			"stopwords": value,
@@ -169,7 +169,7 @@ func (s analyzerStop) WithStopwords(value []string) analyzerStopProperties {
 }
 
 // WithStopwordsPath() sets an external stopwords file path.
-func (s analyzerStop) WithStopwordsPath(value string) analyzerStopProperties {
+func (s AnalyzerStop) WithStopwordsPath(value string) AnalyzerStopProperties {
 	return func() map[string]interface{} {
 		return map[string]interface{}{
 			"stopwords_path": value,
@@ -179,10 +179,10 @@ func (s analyzerStop) WithStopwordsPath(value string) analyzerStopProperties {
 
 // KEYWORD ANALYZER
 
-type analyzerKeyword func(name string) analyzerFunc
+type AnalyzerKeyword func(name string) AnalyzerFunc
 
-func newAnalyzerKeyword() analyzerKeyword {
-	return func(name string) analyzerFunc {
+func newAnalyzerKeyword() AnalyzerKeyword {
+	return func(name string) AnalyzerFunc {
 		return func() map[string]interface{} {
 			r := map[string]interface{}{}
 
@@ -197,11 +197,11 @@ func newAnalyzerKeyword() analyzerKeyword {
 
 // PATTERN ANALYZER
 
-type analyzerPatternProperties func() map[string]interface{}
-type analyzerPattern func(name string, properties ...analyzerPatternProperties) analyzerFunc
+type AnalyzerPatternProperties func() map[string]interface{}
+type AnalyzerPattern func(name string, properties ...AnalyzerPatternProperties) AnalyzerFunc
 
-func newAnalyzerPattern() analyzerPattern {
-	return func(name string, properties ...analyzerPatternProperties) analyzerFunc {
+func newAnalyzerPattern() AnalyzerPattern {
+	return func(name string, properties ...AnalyzerPatternProperties) AnalyzerFunc {
 		return func() map[string]interface{} {
 			r := map[string]interface{}{}
 
@@ -236,7 +236,7 @@ var (
 )
 
 // WithPattern() sets the pattern used to tokenize text.
-func (p analyzerPattern) WithPattern(value AnalyzerPatternPattern) analyzerPatternProperties {
+func (p AnalyzerPattern) WithPattern(value AnalyzerPatternPattern) AnalyzerPatternProperties {
 	return func() map[string]interface{} {
 		return map[string]interface{}{
 			"pattern": value,
@@ -257,7 +257,7 @@ var (
 )
 
 // WithFlags() configures regex flags (e.g., CASE_INSENSITIVE).
-func (p analyzerPattern) WithFlags(value []AnalyzerPatternFlags) analyzerPatternProperties {
+func (p AnalyzerPattern) WithFlags(value []AnalyzerPatternFlags) AnalyzerPatternProperties {
 	return func() map[string]interface{} {
 		flags := []string{}
 
@@ -274,7 +274,7 @@ func (p analyzerPattern) WithFlags(value []AnalyzerPatternFlags) analyzerPattern
 }
 
 // WithLowercase() sets whether text should be lowercased.
-func (p analyzerPattern) WithLowercase(enable bool) analyzerPatternProperties {
+func (p AnalyzerPattern) WithLowercase(enable bool) AnalyzerPatternProperties {
 	return func() map[string]interface{} {
 		return map[string]interface{}{
 			"lowercase": enable,
@@ -283,7 +283,7 @@ func (p analyzerPattern) WithLowercase(enable bool) analyzerPatternProperties {
 }
 
 // WithStopwords() sets the stopwords for the standard analyzer.
-func (p analyzerPattern) WithStopwords(value []string) analyzerPatternProperties {
+func (p AnalyzerPattern) WithStopwords(value []string) AnalyzerPatternProperties {
 	return func() map[string]interface{} {
 		return map[string]interface{}{
 			"stopwords": value,
@@ -292,7 +292,7 @@ func (p analyzerPattern) WithStopwords(value []string) analyzerPatternProperties
 }
 
 // WithStopwordsPath() sets an external stopwords file path.
-func (p analyzerPattern) WithStopwordsPath(value string) analyzerPatternProperties {
+func (p AnalyzerPattern) WithStopwordsPath(value string) AnalyzerPatternProperties {
 	return func() map[string]interface{} {
 		return map[string]interface{}{
 			"stopwords_path": value,
@@ -302,8 +302,8 @@ func (p analyzerPattern) WithStopwordsPath(value string) analyzerPatternProperti
 
 // LANGUAGE ANALYZER
 
-type analyzerLanguageProperties func() map[string]interface{}
-type analyzerLanguage func(name string, language AnalyzerLanguageLanguage, properties ...analyzerLanguageProperties) analyzerFunc
+type AnalyzerLanguageProperties func() map[string]interface{}
+type AnalyzerLanguage func(name string, language AnalyzerLanguageLanguage, properties ...AnalyzerLanguageProperties) AnalyzerFunc
 
 // AnalyzerLanguageLanguage defines language-specific analyzers provided by Elasticsearch.
 type AnalyzerLanguageLanguage string
@@ -347,8 +347,8 @@ var (
 	AnalyzerLanguageThai       AnalyzerLanguageLanguage = "thai"
 )
 
-func newAnalyzerLanguage() analyzerLanguage {
-	return func(name string, language AnalyzerLanguageLanguage, properties ...analyzerLanguageProperties) analyzerFunc {
+func newAnalyzerLanguage() AnalyzerLanguage {
+	return func(name string, language AnalyzerLanguageLanguage, properties ...AnalyzerLanguageProperties) AnalyzerFunc {
 		return func() map[string]interface{} {
 			stemExclusionAllow := map[string]string{
 				"arabic":     "",
@@ -410,7 +410,7 @@ func newAnalyzerLanguage() analyzerLanguage {
 }
 
 // WithStopwords() sets the stopwords for the standard analyzer.
-func (l analyzerLanguage) WithStopwords(value []string) analyzerLanguageProperties {
+func (l AnalyzerLanguage) WithStopwords(value []string) AnalyzerLanguageProperties {
 	return func() map[string]interface{} {
 		return map[string]interface{}{
 			"stopwords": value,
@@ -419,7 +419,7 @@ func (l analyzerLanguage) WithStopwords(value []string) analyzerLanguageProperti
 }
 
 // WithStopwordsPath() sets an external stopwords file path.
-func (l analyzerLanguage) WithStopwordsPath(value string) analyzerLanguageProperties {
+func (l AnalyzerLanguage) WithStopwordsPath(value string) AnalyzerLanguageProperties {
 	return func() map[string]interface{} {
 		return map[string]interface{}{
 			"stopwords_path": value,
@@ -428,7 +428,7 @@ func (l analyzerLanguage) WithStopwordsPath(value string) analyzerLanguageProper
 }
 
 // WithStemExclusion() defines a list of terms that should not be stemmed during analysis.
-func (l analyzerLanguage) WithStemExclusion(value []string) analyzerLanguageProperties {
+func (l AnalyzerLanguage) WithStemExclusion(value []string) AnalyzerLanguageProperties {
 	return func() map[string]interface{} {
 		return map[string]interface{}{
 			"stem_exclusion": value,
@@ -438,11 +438,11 @@ func (l analyzerLanguage) WithStemExclusion(value []string) analyzerLanguageProp
 
 // FINGERPRINT ANALYZER
 
-type analyzerFingerprintProperties func() map[string]interface{}
-type analyzerFingerprint func(name string, properties ...analyzerFingerprintProperties) analyzerFunc
+type AnalyzerFingerprintProperties func() map[string]interface{}
+type AnalyzerFingerprint func(name string, properties ...AnalyzerFingerprintProperties) AnalyzerFunc
 
-func newAnalyzerFingerprint() analyzerFingerprint {
-	return func(name string, properties ...analyzerFingerprintProperties) analyzerFunc {
+func newAnalyzerFingerprint() AnalyzerFingerprint {
+	return func(name string, properties ...AnalyzerFingerprintProperties) AnalyzerFunc {
 		return func() map[string]interface{} {
 			r := map[string]interface{}{}
 
@@ -465,7 +465,7 @@ func newAnalyzerFingerprint() analyzerFingerprint {
 }
 
 // WithSeparator() sets the string used to join tokens into a fingerprint.
-func (f analyzerFingerprint) WithSeparator(value string) analyzerFingerprintProperties {
+func (f AnalyzerFingerprint) WithSeparator(value string) AnalyzerFingerprintProperties {
 	return func() map[string]interface{} {
 		return map[string]interface{}{
 			"separator": value,
@@ -474,7 +474,7 @@ func (f analyzerFingerprint) WithSeparator(value string) analyzerFingerprintProp
 }
 
 // WithMaxOutputSize() sets max length of the resulting fingerprint string.
-func (f analyzerFingerprint) WithMaxOutputSize(value int) analyzerFingerprintProperties {
+func (f AnalyzerFingerprint) WithMaxOutputSize(value int) AnalyzerFingerprintProperties {
 	return func() map[string]interface{} {
 		return map[string]interface{}{
 			"max_output_size": value,
@@ -483,7 +483,7 @@ func (f analyzerFingerprint) WithMaxOutputSize(value int) analyzerFingerprintPro
 }
 
 // WithStopwords() sets the stopwords for the standard analyzer.
-func (f analyzerFingerprint) WithStopwords(value []string) analyzerFingerprintProperties {
+func (f AnalyzerFingerprint) WithStopwords(value []string) AnalyzerFingerprintProperties {
 	return func() map[string]interface{} {
 		return map[string]interface{}{
 			"stopwords": value,
@@ -492,7 +492,7 @@ func (f analyzerFingerprint) WithStopwords(value []string) analyzerFingerprintPr
 }
 
 // WithStopwordsPath() sets an external stopwords file path.
-func (f analyzerFingerprint) WithStopwordsPath(value string) analyzerFingerprintProperties {
+func (f AnalyzerFingerprint) WithStopwordsPath(value string) AnalyzerFingerprintProperties {
 	return func() map[string]interface{} {
 		return map[string]interface{}{
 			"stopwords_path": value,
@@ -502,11 +502,11 @@ func (f analyzerFingerprint) WithStopwordsPath(value string) analyzerFingerprint
 
 // STOP ANALYZER
 
-type analyzerCustomProperties func() map[string]interface{}
-type analyzerCustom func(name string, properties ...analyzerCustomProperties) analyzerFunc
+type AnalyzerCustomProperties func() map[string]interface{}
+type AnalyzerCustom func(name string, properties ...AnalyzerCustomProperties) AnalyzerFunc
 
-func newAnalyzerCustom() analyzerCustom {
-	return func(name string, properties ...analyzerCustomProperties) analyzerFunc {
+func newAnalyzerCustom() AnalyzerCustom {
+	return func(name string, properties ...AnalyzerCustomProperties) AnalyzerFunc {
 		return func() map[string]interface{} {
 			r := map[string]interface{}{}
 
@@ -550,7 +550,7 @@ var (
 )
 
 // WithTokenizer() sets the tokenizer for a custom analyzer.
-func (c analyzerCustom) WithTokenizer(value AnalyzerCustomTokenizer) analyzerCustomProperties {
+func (c AnalyzerCustom) WithTokenizer(value AnalyzerCustomTokenizer) AnalyzerCustomProperties {
 	return func() map[string]interface{} {
 		return map[string]interface{}{
 			"tokenizer": value,
@@ -568,7 +568,7 @@ var (
 )
 
 // WithCharFilter() adds one or more character filters to a custom analyzer.
-func (c analyzerCustom) WithCharFilter(value []AnalyzerCustomCharFilter) analyzerCustomProperties {
+func (c AnalyzerCustom) WithCharFilter(value []AnalyzerCustomCharFilter) AnalyzerCustomProperties {
 	return func() map[string]interface{} {
 		return map[string]interface{}{
 			"char_filter": value,
@@ -631,7 +631,7 @@ var (
 )
 
 // WithFilter() sets the list of token filters to apply to the output of the tokenizer.
-func (c analyzerCustom) WithFilter(value []AnalyzerCustomFilter) analyzerCustomProperties {
+func (c AnalyzerCustom) WithFilter(value []AnalyzerCustomFilter) AnalyzerCustomProperties {
 	return func() map[string]interface{} {
 		return map[string]interface{}{
 			"filter": value,
@@ -640,7 +640,7 @@ func (c analyzerCustom) WithFilter(value []AnalyzerCustomFilter) analyzerCustomP
 }
 
 // WithPositionIncrementGap() sets the position increment gap.
-func (c analyzerCustom) WithPositionIncrementGap(value int) analyzerCustomProperties {
+func (c AnalyzerCustom) WithPositionIncrementGap(value int) AnalyzerCustomProperties {
 	return func() map[string]interface{} {
 		return map[string]interface{}{
 			"position_increment_gap": value,
