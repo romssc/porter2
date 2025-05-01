@@ -215,13 +215,13 @@ Field types are created using fluent builder functions under p.Index.Mappings.Pr
 
 ```go
 Properties: p.Index.Mappings.NewFields(
-   p.Index.Mappings.Properties.Keyword(< Field name >, < Fake type >,
-      p.Index.Mappings.Properties.Keyword.WithStore(< Bool >),
-      p.Index.Mappings.Properties.Keyword.WithNormalizer(< Normalizer name >),
+   p.Index.Mappings.Properties.Keyword("keyword", porter.FakeCity,
+      p.Index.Mappings.Properties.Keyword.WithStore(ture),
+      p.Index.Mappings.Properties.Keyword.WithNormalizer("normalizer"),
    ),
-   p.Index.Mappings.Properties.Integer(< Field name >, < Fake type >,
-      p.Index.Mappings.Properties.Integer.WithStore( < Bool >),
-      p.Index.Mappings.Properties.Integer.WithNullValue(< Value >),
+   p.Index.Mappings.Properties.Integer("integer", porter.FakeIntegerInt,
+      p.Index.Mappings.Properties.Integer.WithStore(true),
+      p.Index.Mappings.Properties.Integer.WithNullValue(0),
    ),
 ),
 ```
@@ -255,9 +255,8 @@ Each type has dedicated `.With*()` helpers (e.g. `.WithIndex(...)`, `.WithStore(
 ```go
 Analysis: &porter.AnalysisConfig{
    Analyzer: p.Index.Settings.Analysis.NewAnalyzer(
-      p.Index.Settings.Analysis.Analyzer.Custom(
-         < Analyzer name >,
-         p.Index.Settings.Analysis.Analyzer.Custom.WithTokenizer(< Tokenizer name >),
+      p.Index.Settings.Analysis.Analyzer.Custom("analyzer",
+         p.Index.Settings.Analysis.Analyzer.Custom.WithTokenizer("tokenizer"),
          p.Index.Settings.Analysis.Analyzer.Custom.WithFilter([]porter.AnalyzerCustomFilter{
             porter.AnalyzerCustomFilterLowercase,
             porter.AnalyzerCustomFilterStop,
@@ -271,7 +270,7 @@ You can also use built-in **analyzers** like:
 
 ```go
 p.Index.Settings.Analysis.NewAnalyzer(
-   p.Index.Settings.Analysis.Analyzer.Simple(< Analyzer name >),
+   p.Index.Settings.Analysis.Analyzer.Simple("analyzer"),
 )
 ```
 
@@ -281,8 +280,7 @@ p.Index.Settings.Analysis.NewAnalyzer(
 
 ```go
 Normalizer: p.Index.Settings.Analysis.NewNormalizer(
-   p.Index.Settings.Analysis.Normalizer.Custom(
-      < Normalizer name >,
+   p.Index.Settings.Analysis.Normalizer.Custom("normalizer",
       p.Index.Settings.Analysis.Normalizer.Custom.WithFilter([]porter.NormalizerCustomFilter{
          porter.NormalizerCustomFilterASCIIFolding,
          porter.NormalizerCustomFilterLowercase,
