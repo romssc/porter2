@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/brianvoe/gofakeit/v7"
-	"github.com/xoticdsign/porter/internal/utils"
+	"github.com/xoticdsign/porter2/internal/utils"
 )
 
 /*

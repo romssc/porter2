@@ -1,4 +1,4 @@
-module github.com/xoticdsign/porter
+module github.com/xoticdsign/porter2
 
 go 1.23.0
 

@@ -13,7 +13,7 @@ import (
 	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/wait"
 
-	"github.com/xoticdsign/porter"
+	porter "github.com/xoticdsign/porter2"
 )
 
 type suite struct {

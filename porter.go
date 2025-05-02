@@ -9,7 +9,7 @@ import (
 
 	"github.com/elastic/go-elasticsearch/v8"
 
-	"github.com/xoticdsign/porter/internal/utils"
+	"github.com/xoticdsign/porter2/internal/utils"
 )
 
 var (

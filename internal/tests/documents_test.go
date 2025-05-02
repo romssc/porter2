@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/xoticdsign/porter/internal/tests/suite"
+	"github.com/xoticdsign/porter2/internal/tests/suite"
 )
 
 func TestLocationFromFile_Functional(t *testing.T) {

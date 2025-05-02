@@ -4,8 +4,9 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/xoticdsign/porter"
-	"github.com/xoticdsign/porter/internal/tests/suite"
+
+	porter "github.com/xoticdsign/porter2"
+	"github.com/xoticdsign/porter2/internal/tests/suite"
 )
 
 func TestNewNormalizer_Functional(t *testing.T) {
