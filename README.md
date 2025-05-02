@@ -1,4 +1,4 @@
-# 🚢 Porter
+# Porter
 
 **Porter** is a flexible and composable migration toolkit for Elasticsearch, written in Go. It helps developers define, manage, and test index definitions and synthetic document generation.
 
@@ -14,7 +14,7 @@ This section outlines the typical flow for using Porter in your application: ins
 Install **Porter** using `go get`.
 
 ```bash
-go get github.com/xoticdsign/porter
+go get github.com/xoticdsign/porter2
 ```
 
 ### 2. Configure Elasticsearch
@@ -88,7 +88,7 @@ package main
 
 import (
    "github.com/elastic/go-elasticsearch/v8"
-   "github.com/xoticdsign/porter"
+   porter "github.com/xoticdsign/porter2"
 )
 
 func main() {
@@ -130,7 +130,7 @@ package main
 
 import (
    "github.com/elastic/go-elasticsearch/v8"
-   "github.com/xoticdsign/porter"
+   porter "github.com/xoticdsign/porter2"
 )
 
 func main() {
