@@ -1,3 +1,5 @@
+<img src="https://github.com/user-attachments/assets/762567d8-d5da-4ab3-8903-4bbbb6d6583b">
+
 # Porter2
 
 **Porter** is a flexible and composable migration toolkit for Elasticsearch, written in Go. It helps developers define, manage, and test index definitions and synthetic document generation.
@@ -301,7 +303,7 @@ Contributions are welcome! If you’d like to improve the toolkit, fix bugs, or 
 - Open a **pull request**
 - Please ensure your code is clean, covered by tests, and adheres to idiomatic Go practices.
 
-If you have ideas, feedback, or questions—feel free to open an issue or start a discussion.
+If you have ideas, feedback, or questions — feel free to open an issue or start a discussion.
 
 ## 📄 License
 
